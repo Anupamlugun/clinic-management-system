@@ -1,0 +1,86 @@
+package com.clinic.cms.doctor.controller;
+
+import com.clinic.cms.common.dto.ApiResponse;
+import com.clinic.cms.doctor.dto.DoctorCreateRequest;
+import com.clinic.cms.doctor.dto.DoctorResponse;
+import com.clinic.cms.doctor.dto.DoctorUpdateRequest;
+import com.clinic.cms.doctor.service.DoctorService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/v1/doctors")
+@RequiredArgsConstructor
+@Tag(name = "Doctor", description = "Doctor Management APIs")
+public class DoctorController {
+
+    private final DoctorService doctorService;
+
+    @PostMapping
+    @Operation(summary = "Create Doctor")
+    public ResponseEntity<ApiResponse<DoctorResponse>> create(
+            @Valid @RequestBody DoctorCreateRequest request) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(
+                        doctorService.createDoctor(request)));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get Doctor By Id")
+    public ResponseEntity<ApiResponse<DoctorResponse>> get(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        doctorService.getDoctor(id)));
+    }
+
+    @GetMapping
+    @Operation(summary = "Get All Doctors")
+    public ResponseEntity<ApiResponse<Page<DoctorResponse>>> getAll(
+            @ParameterObject
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "id",
+                    direction = Sort.Direction.ASC
+            )
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        doctorService.getAllDoctors(pageable)));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update Doctor")
+    public ResponseEntity<ApiResponse<DoctorResponse>> update(
+            @PathVariable Long id,
+            @RequestBody DoctorUpdateRequest request) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        doctorService.updateDoctor(id, request)));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete Doctor")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id) {
+
+        doctorService.deleteDoctor(id);
+
+        return ResponseEntity.noContent().build();
+    }
+}

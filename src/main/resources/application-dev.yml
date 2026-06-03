@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/clinic
+    username: postgres
+    password: lugun
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    try-it-out-enabled: true
+    display-request-duration: true
+    doc-expansion: none
+
+  show-actuator: false
+
+  packages-to-scan: com.clinic.cms
