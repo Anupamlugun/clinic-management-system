@@ -1,13 +1,19 @@
 package com.clinic.cms.doctor.entity;
 
 import com.clinic.cms.common.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "doctors")
+@Table(
+        name = "doctors",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_doctor_email",
+                        columnNames = "email"
+                )
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,19 +21,28 @@ import lombok.*;
 @Builder
 public class Doctor extends BaseEntity {
 
-    @Column(nullable = false)
+    @Column(nullable = false,length = 100)
     private String firstName;
 
+    @Column(length = 100)
     private String lastName;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, length = 255)
     private String email;
 
+    @Column(length = 20)
     private String phoneNumber;
 
-    private String specialization;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "specialization_id",
+            nullable = false
+    )
+    private DoctorSpecialization specialization;
 
+    @Column(nullable = false)
     private Integer experienceYears;
 
-    private Boolean active;
+    @Column(nullable = false)
+    private Boolean active = true;
 }

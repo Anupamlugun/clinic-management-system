@@ -1,19 +1,25 @@
 package com.clinic.cms.doctor.dto;
 
-import lombok.Data;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 
-@Data
-public class DoctorUpdateRequest {
+public record DoctorUpdateRequest(
 
-    private String firstName;
+        @Size(max = 100)
+        String firstName,
 
-    private String lastName;
+        @Size(max = 100)
+        String lastName,
 
-    private String phoneNumber;
+        @Size(max = 20)
+        String phoneNumber,
 
-    private String specialization;
+        Long specializationId,
 
-    private Integer experienceYears;
+        @PositiveOrZero(message = "Experience years cannot be negative")
+        Integer experienceYears,
 
-    private Boolean active;
+        Boolean active
+
+) {
 }

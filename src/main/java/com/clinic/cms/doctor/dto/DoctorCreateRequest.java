@@ -1,23 +1,28 @@
 package com.clinic.cms.doctor.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import jakarta.validation.constraints.*;
 
-@Data
-public class DoctorCreateRequest {
+public record DoctorCreateRequest(
 
-    @NotBlank
-    private String firstName;
+        @NotBlank(message = "First name is required")
+        @Size(max = 100)
+        String firstName,
 
-    private String lastName;
+        @Size(max = 100)
+        String lastName,
 
-    @Email
-    private String email;
+        @NotBlank(message = "Email is required")
+        @Email(message = "Invalid email format")
+        @Size(max = 255)
+        String email,
 
-    private String phoneNumber;
+        @Size(max = 20)
+        String phoneNumber,
 
-    private String specialization;
+        Long specializationId,
 
-    private Integer experienceYears;
-}
+        @NotNull(message = "Experience years is required")
+        @PositiveOrZero(message = "Experience years cannot be negative")
+        Integer experienceYears
+
+) {}

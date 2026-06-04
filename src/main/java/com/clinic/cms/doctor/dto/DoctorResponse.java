@@ -1,25 +1,17 @@
 package com.clinic.cms.doctor.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import java.time.Instant;
 
-@Data
-@Builder
-public class DoctorResponse {
-
-    private Long id;
-
-    private String firstName;
-
-    private String lastName;
-
-    private String email;
-
-    private String phoneNumber;
-
-    private String specialization;
-
-    private Integer experienceYears;
-
-    private Boolean active;
+public record DoctorResponse(
+        Long id,
+        String firstName,
+        String lastName,
+        String email,
+        String phoneNumber,
+        DoctorSpecializationResponse specialization,
+        Integer experienceYears,
+        Boolean active,
+        Instant createdAt,
+        Instant updatedAt
+) {
 }

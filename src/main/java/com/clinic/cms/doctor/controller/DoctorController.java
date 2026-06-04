@@ -33,6 +33,7 @@ public class DoctorController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(
+                        "Doctor created successfully",
                         doctorService.createDoctor(request)));
     }
 
@@ -43,6 +44,7 @@ public class DoctorController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        "Doctor fetch successfully",
                         doctorService.getDoctor(id)));
     }
 
@@ -60,6 +62,7 @@ public class DoctorController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        "Doctor fetch successfully",
                         doctorService.getAllDoctors(pageable)));
     }
 
@@ -71,16 +74,18 @@ public class DoctorController {
 
         return ResponseEntity.ok(
                 ApiResponse.success(
+                        "Doctor updated successfully",
                         doctorService.updateDoctor(id, request)));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete Doctor")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<ApiResponse<Void>> delete(
             @PathVariable Long id) {
 
         doctorService.deleteDoctor(id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                ApiResponse.success("Doctor deleted successfully"));
     }
 }

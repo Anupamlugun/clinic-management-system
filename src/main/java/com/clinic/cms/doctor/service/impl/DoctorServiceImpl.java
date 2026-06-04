@@ -4,8 +4,10 @@ import com.clinic.cms.doctor.dto.DoctorCreateRequest;
 import com.clinic.cms.doctor.dto.DoctorResponse;
 import com.clinic.cms.doctor.dto.DoctorUpdateRequest;
 import com.clinic.cms.doctor.entity.Doctor;
+import com.clinic.cms.doctor.entity.DoctorSpecialization;
 import com.clinic.cms.doctor.mapper.DoctorMapper;
 import com.clinic.cms.doctor.repository.DoctorRepository;
+import com.clinic.cms.doctor.repository.DoctorSpecializationRepository;
 import com.clinic.cms.doctor.service.DoctorService;
 import com.clinic.cms.exception.custom.ResourceAlreadyExistsException;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
@@ -22,18 +24,27 @@ public class DoctorServiceImpl implements DoctorService {
 
     private final DoctorRepository repository;
     private final DoctorMapper mapper;
+    private final DoctorSpecializationRepository specializationRepository;
 
     @Override
     public DoctorResponse createDoctor(
             DoctorCreateRequest request) {
 
-        if(repository.existsByEmail(request.getEmail())) {
+        if(repository.existsByEmail(request.email())) {
             throw new ResourceAlreadyExistsException(
                     "Doctor already exists");
         }
 
         Doctor doctor = mapper.toEntity(request);
-        doctor.setActive(true);
+
+        DoctorSpecialization specialization =
+                specializationRepository.findById(
+                                request.specializationId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Doctor specialization not found"));
+
+        doctor.setSpecialization(specialization);
 
         return mapper.toResponse(
                 repository.save(doctor));
@@ -68,11 +79,17 @@ public class DoctorServiceImpl implements DoctorService {
                         new ResourceNotFoundException(
                                 "Doctor not found"));
 
-        doctor.setFirstName(request.getFirstName());
-        doctor.setLastName(request.getLastName());
-        doctor.setPhoneNumber(request.getPhoneNumber());
-        doctor.setSpecialization(request.getSpecialization());
-        doctor.setExperienceYears(request.getExperienceYears());
+        DoctorSpecialization specialization =
+                specializationRepository.findById(
+                                request.specializationId())
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Doctor specialization not found"));
+        doctor.setFirstName(request.firstName());
+        doctor.setLastName(request.lastName());
+        doctor.setPhoneNumber(request.phoneNumber());
+        doctor.setSpecialization(specialization);
+        doctor.setExperienceYears(request.experienceYears());
 
         return mapper.toResponse(
                 repository.save(doctor));
