@@ -1,9 +1,9 @@
-package com.clinic.cms.doctor.controller;
+package com.clinic.cms.doctor.controller.v1;
 
 import com.clinic.cms.common.dto.ApiResponse;
-import com.clinic.cms.doctor.dto.DoctorCreateRequest;
-import com.clinic.cms.doctor.dto.DoctorResponse;
-import com.clinic.cms.doctor.dto.DoctorUpdateRequest;
+import com.clinic.cms.doctor.dto.v1.DoctorCreateRequest;
+import com.clinic.cms.doctor.dto.v1.DoctorResponse;
+import com.clinic.cms.doctor.dto.v1.DoctorUpdateRequest;
 import com.clinic.cms.doctor.service.DoctorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

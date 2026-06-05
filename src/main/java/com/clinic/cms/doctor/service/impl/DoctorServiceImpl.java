@@ -1,11 +1,11 @@
 package com.clinic.cms.doctor.service.impl;
 
-import com.clinic.cms.doctor.dto.DoctorCreateRequest;
-import com.clinic.cms.doctor.dto.DoctorResponse;
-import com.clinic.cms.doctor.dto.DoctorUpdateRequest;
+import com.clinic.cms.doctor.dto.v1.DoctorCreateRequest;
+import com.clinic.cms.doctor.dto.v1.DoctorResponse;
+import com.clinic.cms.doctor.dto.v1.DoctorUpdateRequest;
 import com.clinic.cms.doctor.entity.Doctor;
 import com.clinic.cms.doctor.entity.DoctorSpecialization;
-import com.clinic.cms.doctor.mapper.DoctorMapper;
+import com.clinic.cms.doctor.mapper.v1.DoctorMapper;
 import com.clinic.cms.doctor.repository.DoctorRepository;
 import com.clinic.cms.doctor.repository.DoctorSpecializationRepository;
 import com.clinic.cms.doctor.service.DoctorService;

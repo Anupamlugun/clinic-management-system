@@ -1,7 +1,7 @@
-package com.clinic.cms.doctor.mapper;
+package com.clinic.cms.doctor.mapper.v1;
 
-import com.clinic.cms.doctor.dto.DoctorSpecializationCreateRequest;
-import com.clinic.cms.doctor.dto.DoctorSpecializationResponse;
+import com.clinic.cms.doctor.dto.v1.DoctorSpecializationCreateRequest;
+import com.clinic.cms.doctor.dto.v1.DoctorSpecializationResponse;
 import com.clinic.cms.doctor.entity.DoctorSpecialization;
 import org.mapstruct.Mapper;
 

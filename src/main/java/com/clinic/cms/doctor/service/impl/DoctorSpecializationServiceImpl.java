@@ -1,8 +1,10 @@
 package com.clinic.cms.doctor.service.impl;
 
-import com.clinic.cms.doctor.dto.*;
+import com.clinic.cms.doctor.dto.v1.DoctorSpecializationCreateRequest;
+import com.clinic.cms.doctor.dto.v1.DoctorSpecializationResponse;
+import com.clinic.cms.doctor.dto.v1.DoctorSpecializationUpdateRequest;
 import com.clinic.cms.doctor.entity.DoctorSpecialization;
-import com.clinic.cms.doctor.mapper.DoctorSpecializationMapper;
+import com.clinic.cms.doctor.mapper.v1.DoctorSpecializationMapper;
 import com.clinic.cms.doctor.repository.DoctorSpecializationRepository;
 import com.clinic.cms.doctor.service.DoctorSpecializationService;
 import com.clinic.cms.exception.custom.ResourceAlreadyExistsException;

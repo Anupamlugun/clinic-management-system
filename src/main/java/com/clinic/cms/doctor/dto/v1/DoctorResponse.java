@@ -1,4 +1,4 @@
-package com.clinic.cms.doctor.dto;
+package com.clinic.cms.doctor.dto.v1;
 
 import java.time.Instant;
 
