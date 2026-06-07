@@ -88,13 +88,13 @@ http://localhost:8080
 Swagger UI:
 
 ```text
-http://localhost:8080/swagger-ui.html
+http://localhost:8080/api/swagger-ui/index.html
 ```
 
 OpenAPI JSON:
 
 ```text
-http://localhost:8080/v3/api-docs
+http://localhost:8080/api/v3/api-docs/v1
 ```
 
 ---

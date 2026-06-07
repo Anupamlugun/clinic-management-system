@@ -13,6 +13,8 @@ import org.mapstruct.Mapping;
 public interface DoctorMapper {
 
     @Mapping(target = "specialization", ignore = true)
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "active", ignore = true)
     Doctor toEntity(DoctorCreateRequest request);
 
     DoctorResponse toResponse(Doctor doctor);

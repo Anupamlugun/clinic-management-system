@@ -1,6 +1,6 @@
 package com.clinic.cms.exception.handler;
 
-import com.clinic.cms.common.dto.ApiResponse;
+import com.clinic.cms.common.dto.v1.ApiResponse;
 import com.clinic.cms.exception.custom.ResourceAlreadyExistsException;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;

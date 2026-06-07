@@ -1,5 +1,6 @@
 package com.clinic.cms.doctor.entity;
 
+import com.clinic.cms.auth.entity.User;
 import com.clinic.cms.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,6 +21,15 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Doctor extends BaseEntity {
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "user_id",
+            nullable = false,
+            unique = true,
+            foreignKey = @ForeignKey(name = "fk_doctor_user")
+    )
+    private User user;
 
     @Column(nullable = false,length = 100)
     private String firstName;
@@ -43,6 +53,7 @@ public class Doctor extends BaseEntity {
     @Column(nullable = false)
     private Integer experienceYears;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;
 }

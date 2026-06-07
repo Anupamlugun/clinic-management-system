@@ -1,6 +1,6 @@
 package com.clinic.cms.doctor.controller.v1;
 
-import com.clinic.cms.common.dto.ApiResponse;
+import com.clinic.cms.common.dto.v1.ApiResponse;
 import com.clinic.cms.doctor.dto.v1.DoctorCreateRequest;
 import com.clinic.cms.doctor.dto.v1.DoctorResponse;
 import com.clinic.cms.doctor.dto.v1.DoctorUpdateRequest;

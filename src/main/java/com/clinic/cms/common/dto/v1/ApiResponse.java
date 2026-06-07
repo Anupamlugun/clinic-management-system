@@ -1,4 +1,4 @@
-package com.clinic.cms.common.dto;
+package com.clinic.cms.common.dto.v1;
 
 import lombok.Builder;
 import lombok.Data;

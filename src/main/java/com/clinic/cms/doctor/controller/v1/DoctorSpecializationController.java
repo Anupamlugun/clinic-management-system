@@ -1,10 +1,11 @@
 package com.clinic.cms.doctor.controller.v1;
 
-import com.clinic.cms.common.dto.ApiResponse;
+import com.clinic.cms.common.dto.v1.ApiResponse;
 import com.clinic.cms.doctor.dto.v1.DoctorSpecializationCreateRequest;
 import com.clinic.cms.doctor.dto.v1.DoctorSpecializationResponse;
 import com.clinic.cms.doctor.dto.v1.DoctorSpecializationUpdateRequest;
 import com.clinic.cms.doctor.service.DoctorSpecializationService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class DoctorSpecializationController {
     private final DoctorSpecializationService service;
 
     @PostMapping
+    @Operation(summary = "Create Doctor specializations")
     public ResponseEntity<ApiResponse<DoctorSpecializationResponse>> create(
             @Valid @RequestBody DoctorSpecializationCreateRequest request) {
 
@@ -42,6 +44,7 @@ public class DoctorSpecializationController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get Doctor specializations By Id")
     public ResponseEntity<ApiResponse<DoctorSpecializationResponse>> get(
             @PathVariable Long id) {
 
@@ -53,6 +56,7 @@ public class DoctorSpecializationController {
     }
 
     @GetMapping
+    @Operation(summary="Get All Doctor Specialization")
     public ResponseEntity<ApiResponse<Page<DoctorSpecializationResponse>>> getAll(
             @ParameterObject
             @PageableDefault(
@@ -70,6 +74,7 @@ public class DoctorSpecializationController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary="Update Doctor Specialization")
     public ResponseEntity<ApiResponse<DoctorSpecializationResponse>> update(
             @PathVariable Long id,
             @Valid @RequestBody DoctorSpecializationUpdateRequest request) {
@@ -82,6 +87,7 @@ public class DoctorSpecializationController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary="Delete Doctor Specialization")
     public ResponseEntity<ApiResponse<Void>> delete(
             @PathVariable Long id) {
 
