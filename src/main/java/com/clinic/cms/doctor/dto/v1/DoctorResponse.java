@@ -1,5 +1,7 @@
 package com.clinic.cms.doctor.dto.v1;
 
+import com.clinic.cms.doctor.enums.DoctorStatus;
+
 import java.time.Instant;
 
 public record DoctorResponse(
@@ -11,6 +13,7 @@ public record DoctorResponse(
         DoctorSpecializationResponse specialization,
         Integer experienceYears,
         Boolean active,
+        DoctorStatus status,
         Instant createdAt,
         Instant updatedAt
 ) {

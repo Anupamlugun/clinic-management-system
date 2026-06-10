@@ -3,6 +3,7 @@ package com.clinic.cms.doctor.controller.v1;
 import com.clinic.cms.common.dto.v1.ApiResponse;
 import com.clinic.cms.doctor.dto.v1.DoctorCreateRequest;
 import com.clinic.cms.doctor.dto.v1.DoctorResponse;
+import com.clinic.cms.doctor.dto.v1.DoctorStatusUpdateRequest;
 import com.clinic.cms.doctor.dto.v1.DoctorUpdateRequest;
 import com.clinic.cms.doctor.service.DoctorService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -87,5 +88,13 @@ public class DoctorController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Doctor deleted successfully"));
+    }
+
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "update doctor status")
+    public ResponseEntity<ApiResponse<DoctorResponse>> updateStatus(@PathVariable Long id, DoctorStatusUpdateRequest request) {
+
+        return ResponseEntity.ok(ApiResponse.success("Doctor status updated successfully", doctorService.updateDoctorStatus(id, request)));
+
     }
 }

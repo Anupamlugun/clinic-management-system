@@ -101,6 +101,7 @@ public class DoctorSpecializationServiceImpl
                                 new ResourceNotFoundException(
                                         "Specialization not found"));
 
-        repository.delete(specialization);
+        specialization.setActive(false);
+        repository.save(specialization);
     }
 }

@@ -2,6 +2,7 @@ package com.clinic.cms.doctor.entity;
 
 import com.clinic.cms.auth.entity.User;
 import com.clinic.cms.common.entity.BaseEntity;
+import com.clinic.cms.doctor.enums.DoctorStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -56,4 +57,9 @@ public class Doctor extends BaseEntity {
     @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    @Column(nullable = false, length = 20)
+    private DoctorStatus status = DoctorStatus.ACTIVE;
 }

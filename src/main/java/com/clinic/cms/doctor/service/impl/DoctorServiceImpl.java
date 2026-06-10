@@ -1,8 +1,6 @@
 package com.clinic.cms.doctor.service.impl;
 
-import com.clinic.cms.doctor.dto.v1.DoctorCreateRequest;
-import com.clinic.cms.doctor.dto.v1.DoctorResponse;
-import com.clinic.cms.doctor.dto.v1.DoctorUpdateRequest;
+import com.clinic.cms.doctor.dto.v1.*;
 import com.clinic.cms.doctor.entity.Doctor;
 import com.clinic.cms.doctor.entity.DoctorSpecialization;
 import com.clinic.cms.doctor.mapper.v1.DoctorMapper;
@@ -103,6 +101,21 @@ public class DoctorServiceImpl implements DoctorService {
                         new ResourceNotFoundException(
                                 "Doctor not found"));
 
-        repository.delete(doctor);
+        doctor.setActive(false);
+        repository.save(doctor);
     }
+
+    @Override
+    public DoctorResponse updateDoctorStatus(Long id, DoctorStatusUpdateRequest request) {
+
+        Doctor doctor = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Doctor not found"
+                        ));
+
+        doctor.setStatus(request.status());
+        return mapper.toResponse(repository.save(doctor));
+    }
+
 }
