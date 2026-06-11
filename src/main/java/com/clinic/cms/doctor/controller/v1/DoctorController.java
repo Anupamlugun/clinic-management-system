@@ -1,10 +1,12 @@
 package com.clinic.cms.doctor.controller.v1;
 
 import com.clinic.cms.common.dto.v1.ApiResponse;
+import com.clinic.cms.common.dto.v1.EnumResponse;
 import com.clinic.cms.doctor.dto.v1.DoctorCreateRequest;
 import com.clinic.cms.doctor.dto.v1.DoctorResponse;
 import com.clinic.cms.doctor.dto.v1.DoctorStatusUpdateRequest;
 import com.clinic.cms.doctor.dto.v1.DoctorUpdateRequest;
+import com.clinic.cms.doctor.enums.DoctorStatus;
 import com.clinic.cms.doctor.service.DoctorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,8 +21,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/v1/doctors")
+@RequestMapping("/v1/doctors")
 @RequiredArgsConstructor
 @Tag(name = "Doctor", description = "Doctor Management APIs")
 public class DoctorController {
@@ -96,5 +101,19 @@ public class DoctorController {
 
         return ResponseEntity.ok(ApiResponse.success("Doctor status updated successfully", doctorService.updateDoctorStatus(id, request)));
 
+    }
+
+    @GetMapping("/status")
+    @Operation(summary = "Fetch All Doctor Status")
+    public ResponseEntity<ApiResponse<List<EnumResponse>>> getDoctorStatus(){
+        List<EnumResponse> doctorStatus = Arrays.stream(DoctorStatus.values())
+                .map(ds -> new EnumResponse(
+                        ds.name(),
+                        ds.getDisplayName()))
+                .toList();
+
+        return ResponseEntity.ok(ApiResponse.success(
+                "Doctor status fetched successfully",
+                doctorStatus));
     }
 }

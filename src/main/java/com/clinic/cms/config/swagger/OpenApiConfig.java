@@ -22,7 +22,7 @@ public class OpenApiConfig {
     public GroupedOpenApi v1Api() {
         return GroupedOpenApi.builder()
                 .group("v1")
-                .pathsToMatch("/api/v1/**")
+                .pathsToMatch("/v1/**")
                 .build();
     }
 
@@ -30,7 +30,7 @@ public class OpenApiConfig {
     public GroupedOpenApi v2Api() {
         return GroupedOpenApi.builder()
                 .group("v2")
-                .pathsToMatch("/api/v2/**")
+                .pathsToMatch("/v2/**")
                 .build();
     }
 }

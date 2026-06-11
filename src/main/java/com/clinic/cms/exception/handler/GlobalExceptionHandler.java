@@ -1,6 +1,7 @@
 package com.clinic.cms.exception.handler;
 
 import com.clinic.cms.common.dto.v1.ApiResponse;
+import com.clinic.cms.exception.custom.InvalidAppointmentStatusTransitionException;
 import com.clinic.cms.exception.custom.ResourceAlreadyExistsException;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceAlreadyExistsException.class)
     public ResponseEntity<ApiResponse<?>> handleAlreadyExists(
             ResourceAlreadyExistsException ex) {
+
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidAppointmentStatusTransitionException.class)
+    public ResponseEntity<ApiResponse<?>> handleInvalidTransition(
+            InvalidAppointmentStatusTransitionException ex) {
 
         return ResponseEntity.badRequest()
                 .body(ApiResponse.error(ex.getMessage()));
