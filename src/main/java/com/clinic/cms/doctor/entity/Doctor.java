@@ -26,7 +26,6 @@ public class Doctor extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "user_id",
-            nullable = false,
             unique = true,
             foreignKey = @ForeignKey(name = "fk_doctor_user")
     )

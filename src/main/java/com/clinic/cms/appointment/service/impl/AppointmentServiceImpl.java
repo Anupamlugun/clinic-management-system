@@ -65,7 +65,7 @@ public class AppointmentServiceImpl
                 slot.getSlotDate());
 
         appointment.setStatus(
-                AppointmentStatus.PENDING);
+                AppointmentStatus.CONFIRMED);
 
         if (Boolean.TRUE.equals(request.followUp())
                 && request.parentAppointmentId() != null) {
@@ -158,18 +158,5 @@ public class AppointmentServiceImpl
 
         return mapper.toResponse(
                 repository.save(appointment));
-    }
-
-    @Override
-    public void deleteAppointment(
-            Long id) {
-
-        Appointment appointment =
-                repository.findById(id)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Appointment not found"));
-
-        repository.delete(appointment);
     }
 }

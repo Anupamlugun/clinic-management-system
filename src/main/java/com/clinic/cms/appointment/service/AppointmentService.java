@@ -22,7 +22,4 @@ public interface AppointmentService {
     AppointmentResponse updateStatus(
             Long id,
             AppointmentStatusUpdateRequest request);
-
-    void deleteAppointment(
-            Long id);
 }

@@ -1,5 +1,6 @@
 package com.clinic.cms.patient.entity;
 
+import com.clinic.cms.auth.entity.User;
 import com.clinic.cms.common.entity.BaseEntity;
 import com.clinic.cms.common.enums.Gender;
 import com.clinic.cms.patient.enums.BloodGroup;
@@ -24,6 +25,14 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class Patient extends BaseEntity {
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "user_id",
+            unique = true,
+            foreignKey = @ForeignKey(name = "fk_patient_user")
+    )
+    private User user;
 
     @Column(nullable = false, length = 100)
     private String firstName;

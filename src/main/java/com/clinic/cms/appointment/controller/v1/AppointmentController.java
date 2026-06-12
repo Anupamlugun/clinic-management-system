@@ -111,17 +111,6 @@ public class AppointmentController {
                                 .updateStatus(id, request)));
     }
 
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Delete Appointment")
-    public ResponseEntity<ApiResponse<Void>>
-    delete(@PathVariable Long id) {
-
-        appointmentService.deleteAppointment(id);
-
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        "Appointment deleted successfully"));
-    }
 
     @GetMapping("/status")
     @Operation(summary = "Get Appointment Status")
