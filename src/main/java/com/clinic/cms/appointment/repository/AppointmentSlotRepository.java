@@ -1,6 +1,8 @@
 package com.clinic.cms.appointment.repository;
 
 import com.clinic.cms.appointment.entity.AppointmentSlot;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,27 +14,13 @@ import java.util.List;
 public interface AppointmentSlotRepository
         extends JpaRepository<AppointmentSlot, Long> {
 
-    List<AppointmentSlot> findByDoctorId(Long doctorId);
+    boolean existsByDoctorIdAndSlotDate(Long doctorId, LocalDate slotDate);
 
-    List<AppointmentSlot> findByDoctorIdAndSlotDate(
-            Long doctorId,
-            LocalDate slotDate
-    );
+    Page<AppointmentSlot> findByActiveTrue(
+            Pageable pageable);
 
-    List<AppointmentSlot> findByDoctorIdAndSlotDateAndBookedFalse(
-            Long doctorId,
-            LocalDate slotDate
-    );
-
-    List<AppointmentSlot> findByDoctorIdAndSlotDateAndBookedFalseAndActiveTrue(
-            Long doctorId,
-            LocalDate slotDate
-    );
-
-    boolean existsByDoctorIdAndSlotDateAndStartTimeAndEndTime(
+    Page<AppointmentSlot> findByDoctorIdAndSlotDateAndActiveTrue(
             Long doctorId,
             LocalDate slotDate,
-            LocalTime startTime,
-            LocalTime endTime
-    );
+            Pageable pageable);
 }
