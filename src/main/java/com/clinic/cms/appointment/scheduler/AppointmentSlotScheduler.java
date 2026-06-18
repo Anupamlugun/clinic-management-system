@@ -27,6 +27,7 @@ public class AppointmentSlotScheduler {
     private static final int SLOT_DURATION_MINUTES = 30;
 
     @Scheduled(cron = "0 0 0 * * *")
+//    @Scheduled(cron = "*/5 * * * * *")
     public void generateSlotsForToday() {
 
         LocalDate today = LocalDate.now();

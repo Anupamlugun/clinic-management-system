@@ -5,7 +5,6 @@ import lombok.Getter;
 @Getter
 public enum AppointmentStatus {
 
-    PENDING("Pending"),
     CONFIRMED("Confirmed"),
 
     PAYMENT_PENDING("Payment Pending"),

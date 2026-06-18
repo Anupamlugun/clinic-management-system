@@ -17,12 +17,6 @@ public final class AppointmentWorkflowRules {
     private static final Map<AppointmentStatus, Set<AppointmentStatus>> ALLOWED_TRANSITIONS =
             Map.of(
 
-                    AppointmentStatus.PENDING,
-                    Set.of(
-                            AppointmentStatus.CONFIRMED,
-                            AppointmentStatus.CANCELLED
-                    ),
-
                     AppointmentStatus.CONFIRMED,
                     Set.of(
                             AppointmentStatus.PAYMENT_PENDING,
@@ -91,7 +85,8 @@ public final class AppointmentWorkflowRules {
 
             throw new InvalidAppointmentStatusTransitionException(
                     currentStatus,
-                    targetStatus
+                    targetStatus,
+                    AppointmentWorkflowRules.getAllowedTransitions(currentStatus)
             );
         }
     }

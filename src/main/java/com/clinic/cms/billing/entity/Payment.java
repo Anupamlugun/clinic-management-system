@@ -2,6 +2,7 @@ package com.clinic.cms.billing.entity;
 
 import com.clinic.cms.appointment.entity.Appointment;
 import com.clinic.cms.billing.enums.PaymentMode;
+import com.clinic.cms.billing.enums.PaymentStatus;
 import com.clinic.cms.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,6 +35,10 @@ public class Payment extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private PaymentMode paymentMode;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private PaymentStatus paymentStatus;
 
     @Column(length = 500)
     private String remarks;

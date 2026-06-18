@@ -1,6 +1,7 @@
 package com.clinic.cms.billing.dto.v1;
 
 import com.clinic.cms.billing.enums.PaymentMode;
+import com.clinic.cms.billing.enums.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -19,6 +20,8 @@ public record PaymentResponse(
         String receiptNumber,
 
         PaymentMode paymentMode,
+
+        PaymentStatus paymentStatus,
 
         String remarks,
 

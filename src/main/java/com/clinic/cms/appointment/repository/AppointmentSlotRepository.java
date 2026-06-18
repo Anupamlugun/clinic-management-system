@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AppointmentSlotRepository
@@ -23,4 +24,8 @@ public interface AppointmentSlotRepository
             Long doctorId,
             LocalDate slotDate,
             Pageable pageable);
+
+    Optional<AppointmentSlot> findByIdAndDoctorId(
+            Long slotId,
+            Long doctorId);
 }

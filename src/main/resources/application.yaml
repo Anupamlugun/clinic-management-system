@@ -36,3 +36,8 @@ management:
   endpoint:
     health:
       show-details: always
+
+clinic:
+  billing:
+    receipt-prefix: REC
+

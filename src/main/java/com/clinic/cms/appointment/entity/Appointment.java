@@ -26,8 +26,12 @@ public class Appointment extends BaseEntity {
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "slot_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "slot_id",
+            nullable = false,
+            unique = true,
+            foreignKey = @ForeignKey(name = "fk_appointment_slot"))
     private AppointmentSlot slot;
 
     @Column(nullable = false)
