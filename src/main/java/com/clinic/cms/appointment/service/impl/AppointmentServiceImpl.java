@@ -57,11 +57,19 @@ public class AppointmentServiceImpl
                         new ResourceNotFoundException(
                                 "Patient not found"));
 
+        if (!patient.getActive()) {
+            throw new ValidationException("Patient is inactive");
+        }
+
         Doctor doctor = doctorRepository.findById(
                         request.doctorId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Doctor not found"));
+
+        if (!doctor.getActive()) {
+            throw new ValidationException("Doctor is inactive");
+        }
 
         AppointmentSlot slot =
                 slotRepository.findByIdAndDoctorId(
@@ -70,6 +78,10 @@ public class AppointmentServiceImpl
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Slot not found for the selected doctor"));
+
+        if (!slot.getActive()) {
+            throw new ValidationException("Slot is inactive");
+        }
 
         if (slot.getBooked()) {
             throw new ResourceAlreadyExistsException("Slot already booked");
@@ -151,6 +163,10 @@ public class AppointmentServiceImpl
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Slot not found for the appointment doctor"));
+
+        if (!slot.getActive()) {
+            throw new ValidationException("Slot is inactive");
+        }
 
 
         AppointmentSlot oldSlot = appointment.getSlot();

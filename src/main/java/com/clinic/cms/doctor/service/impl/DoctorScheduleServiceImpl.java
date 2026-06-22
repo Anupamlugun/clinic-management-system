@@ -11,6 +11,7 @@ import com.clinic.cms.doctor.mapper.v1.DoctorScheduleMapper;
 import com.clinic.cms.doctor.repository.DoctorRepository;
 import com.clinic.cms.doctor.repository.DoctorScheduleRepository;
 import com.clinic.cms.doctor.service.DoctorScheduleService;
+import com.clinic.cms.exception.custom.ValidationException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,6 +36,10 @@ public class DoctorScheduleServiceImpl implements DoctorScheduleService {
                         new ResourceNotFoundException(
                                 "Doctor not found with id: "
                                         + request.doctorId()));
+
+        if (!doctor.getActive()) {
+            throw new ValidationException("Doctor is inactive");
+        }
 
         if (scheduleRepository.existsByDoctorIdAndDay(
                 request.doctorId(),

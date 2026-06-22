@@ -9,6 +9,7 @@ import com.clinic.cms.doctor.repository.DoctorSpecializationRepository;
 import com.clinic.cms.doctor.service.DoctorService;
 import com.clinic.cms.exception.custom.ResourceAlreadyExistsException;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
+import com.clinic.cms.exception.custom.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +42,11 @@ public class DoctorServiceImpl implements DoctorService {
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Doctor specialization not found"));
+
+        if (!specialization.getActive()) {
+            throw new ValidationException(
+                    "Doctor specialization is inactive");
+        }
 
         doctor.setSpecialization(specialization);
 
@@ -83,6 +89,11 @@ public class DoctorServiceImpl implements DoctorService {
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Doctor specialization not found"));
+
+        if (!specialization.getActive()) {
+            throw new ValidationException(
+                    "Doctor specialization is inactive");
+        }
         doctor.setFirstName(request.firstName());
         doctor.setLastName(request.lastName());
         doctor.setPhoneNumber(request.phoneNumber());
