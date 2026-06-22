@@ -18,6 +18,7 @@ public interface PaymentMapper {
     @Mapping(target = "appointment", ignore = true)
     @Mapping(target = "paidAt", ignore = true)
     @Mapping(target = "receiptNumber", ignore = true)
+    @Mapping(target = "paymentStatus", ignore = true)
     void updateEntityFromRequest(
             PaymentUpdateRequest request,
             @MappingTarget Payment payment

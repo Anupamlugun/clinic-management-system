@@ -1,6 +1,9 @@
 package com.clinic.cms.appointment.service.impl;
 
-import com.clinic.cms.appointment.dto.v1.*;
+import com.clinic.cms.appointment.dto.v1.AppointmentCreateRequest;
+import com.clinic.cms.appointment.dto.v1.AppointmentResponse;
+import com.clinic.cms.appointment.dto.v1.AppointmentStatusUpdateRequest;
+import com.clinic.cms.appointment.dto.v1.AppointmentUpdateRequest;
 import com.clinic.cms.appointment.entity.Appointment;
 import com.clinic.cms.appointment.entity.AppointmentSlot;
 import com.clinic.cms.appointment.enums.AppointmentStatus;
@@ -9,7 +12,6 @@ import com.clinic.cms.appointment.repository.AppointmentRepository;
 import com.clinic.cms.appointment.repository.AppointmentSlotRepository;
 import com.clinic.cms.appointment.service.AppointmentService;
 import com.clinic.cms.appointment.workflow.AppointmentWorkflowRules;
-import com.clinic.cms.billing.dto.v1.PaymentResponse;
 import com.clinic.cms.billing.service.PaymentService;
 import com.clinic.cms.doctor.entity.Doctor;
 import com.clinic.cms.doctor.repository.DoctorRepository;
@@ -36,12 +38,13 @@ public class AppointmentServiceImpl
     private final AppointmentSlotRepository slotRepository;
     private final AppointmentMapper mapper;
     private final PaymentService paymentService;
+    private final AppointmentWorkflowRules appointmentWorkflowRules;
 
     @Override
     public AppointmentResponse createAppointment(
             AppointmentCreateRequest request) {
 
-        validateFollowUpAppointment(request);
+        validateFollowUpAppointment(request.followUp(),request.parentAppointmentId());
 
 
         Patient patient = patientRepository.findById(
@@ -129,6 +132,8 @@ public class AppointmentServiceImpl
             Long id,
             AppointmentUpdateRequest request) {
 
+        validateFollowUpAppointment(request.followUp(),request.parentAppointmentId());
+
         Appointment appointment =
                 repository.findById(id)
                         .orElseThrow(() ->
@@ -180,7 +185,7 @@ public class AppointmentServiceImpl
                                 new ResourceNotFoundException(
                                         "Appointment not found"));
 
-        AppointmentWorkflowRules
+        appointmentWorkflowRules
                 .validateTransition(
                         appointment.getStatus(),
                         request.status());
@@ -197,19 +202,20 @@ public class AppointmentServiceImpl
     }
 
     private void validateFollowUpAppointment(
-            AppointmentCreateRequest request) {
+            Boolean followUp,
+            Long parentAppointmentId) {
 
         // followUp = true => parentAppointmentId required
-        if (Boolean.TRUE.equals(request.followUp())
-                && request.parentAppointmentId() == null) {
+        if (Boolean.TRUE.equals(followUp)
+                && parentAppointmentId == null) {
 
             throw new ValidationException(
                     "Parent appointment id is required for follow-up appointments");
         }
 
         // followUp = false/null => parentAppointmentId not allowed
-        if (!Boolean.TRUE.equals(request.followUp())
-                && request.parentAppointmentId() != null) {
+        if (!Boolean.TRUE.equals(followUp)
+                && parentAppointmentId != null) {
 
             throw new ValidationException(
                     "Parent appointment id can only be provided when followUp is true");

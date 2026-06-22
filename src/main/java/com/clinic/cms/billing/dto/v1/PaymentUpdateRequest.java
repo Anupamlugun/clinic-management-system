@@ -10,10 +10,8 @@ import java.math.BigDecimal;
 public record PaymentUpdateRequest(
 
 
-        @Size(max = 20)
         PaymentMode paymentMode,
 
-        @Size(max = 20)
         PaymentStatus paymentStatus,
 
         @Size(max = 500, message = "Remarks cannot exceed 500 characters")

@@ -9,6 +9,7 @@ import com.clinic.cms.billing.enums.PaymentStatus;
 import com.clinic.cms.billing.mapper.v1.PaymentMapper;
 import com.clinic.cms.billing.repository.PaymentRepository;
 import com.clinic.cms.billing.service.PaymentService;
+import com.clinic.cms.billing.workflow.PaymentWorkflowRules;
 import com.clinic.cms.config.properties.BillingProperties;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +32,10 @@ public class PaymentServiceImpl
     private final AppointmentRepository appointmentRepository;
     private final PaymentMapper paymentMapper;
     private final BillingProperties billingProperties;
+    private final PaymentWorkflowRules paymentWorkflowRules;
 
     @Override
-    public PaymentResponse createPayment(Long appointmentId) {
+    public Payment createPayment(Long appointmentId) {
 
         Appointment appointment =
                 appointmentRepository.findById(appointmentId)
@@ -47,9 +49,7 @@ public class PaymentServiceImpl
         payment.setAmount(BigDecimal.valueOf(500));
         payment.setPaymentStatus(PaymentStatus.PENDING);
 
-        Payment saved = paymentRepository.save(payment);
-
-        return paymentMapper.toResponse(saved);
+        return paymentRepository.save(payment);
     }
 
     @Override
@@ -87,11 +87,20 @@ public class PaymentServiceImpl
                                 new ResourceNotFoundException(
                                         "Payment not found"));
 
+        paymentWorkflowRules.validateTransition(
+                payment.getPaymentStatus(),
+                request.paymentStatus()
+        );
+
         paymentMapper.updateEntityFromRequest(
                 request,
                 payment);
 
-        payment.setPaidAt(LocalDateTime.now());
+        payment.setPaymentStatus(request.paymentStatus());
+
+        if (request.paymentStatus() == PaymentStatus.COMPLETED) {
+            payment.setPaidAt(LocalDateTime.now());
+        }
 
         Payment updated =
                 paymentRepository.save(payment);

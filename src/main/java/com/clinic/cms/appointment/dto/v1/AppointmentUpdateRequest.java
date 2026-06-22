@@ -11,6 +11,8 @@ public record AppointmentUpdateRequest(
         @Size(max = 1000)
         String reason,
 
-        Boolean followUp
+        Boolean followUp,
+
+        Long parentAppointmentId
 ) {
 }
