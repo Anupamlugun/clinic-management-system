@@ -11,6 +11,7 @@ import com.clinic.cms.billing.repository.PaymentRepository;
 import com.clinic.cms.billing.service.PaymentService;
 import com.clinic.cms.billing.workflow.PaymentWorkflowRules;
 import com.clinic.cms.config.properties.BillingProperties;
+import com.clinic.cms.doctor.entity.Doctor;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -46,7 +47,7 @@ public class PaymentServiceImpl
         Payment payment = new Payment();
 
         payment.setAppointment(appointment);
-        payment.setAmount(BigDecimal.valueOf(500));
+        payment.setAmount(getConsultationAmount(appointment));
         payment.setPaymentStatus(PaymentStatus.PENDING);
 
         return paymentRepository.save(payment);
@@ -116,5 +117,17 @@ public class PaymentServiceImpl
                 .toString()
                 .substring(0, 8)
                 .toUpperCase();
+    }
+    private BigDecimal getConsultationAmount(Appointment appointment) {
+
+        Doctor doctor = appointment.getDoctor();
+
+        boolean isFollowUpAppointment =
+                Boolean.TRUE.equals(appointment.getFollowUp())
+                        && appointment.getParentAppointment() != null;
+
+        return isFollowUpAppointment
+                ? doctor.getFollowUpFee()
+                : doctor.getConsultationFee();
     }
 }
