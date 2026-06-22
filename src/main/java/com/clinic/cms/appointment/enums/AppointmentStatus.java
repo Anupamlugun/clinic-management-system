@@ -5,26 +5,46 @@ import lombok.Getter;
 @Getter
 public enum AppointmentStatus {
 
-    CONFIRMED("Confirmed"),
+    CONFIRMED(
+            "Confirmed",
+            "Appointment has been confirmed and scheduled"
+    ),
 
-    PAYMENT_PENDING("Payment Pending"),
-    PAYMENT_COMPLETED("Payment Completed"),
+    CHECKED_IN(
+            "Checked In",
+            "Patient has arrived and checked in at the clinic"
+    ),
 
-    CHECKED_IN("Checked In"),
+    IN_CONSULTATION(
+            "In Consultation",
+            "Patient is currently consulting with the doctor"
+    ),
 
-    IN_CONSULTATION("In Consultation"),
+    COMPLETED(
+            "Completed",
+            "Consultation and appointment have been completed"
+    ),
 
-    COMPLETED("Completed"),
+    FOLLOW_UP_SCHEDULED(
+            "Follow Up Scheduled",
+            "A follow-up appointment has been scheduled"
+    ),
 
-    FOLLOW_UP_SCHEDULED("Follow Up Scheduled"),
+    CANCELLED(
+            "Cancelled",
+            "Appointment has been cancelled"
+    ),
 
-    CANCELLED("Cancelled"),
-
-    NO_SHOW("No Show");
+    NO_SHOW(
+            "No Show",
+            "Patient did not arrive for the scheduled appointment"
+    );
 
     private final String displayName;
+    private final String description;
 
-    AppointmentStatus(String displayName) {
+    AppointmentStatus(String displayName, String description) {
         this.displayName = displayName;
+        this.description = description;
     }
 }

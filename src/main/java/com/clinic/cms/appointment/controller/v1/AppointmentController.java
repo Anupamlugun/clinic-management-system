@@ -42,7 +42,7 @@ public class AppointmentController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(
-                        "Appointment created successfully",
+                        "Appointment has been confirmed and scheduled",
                         appointmentService
                                 .createAppointment(request)));
     }
@@ -104,11 +104,11 @@ public class AppointmentController {
             @RequestBody
             AppointmentStatusUpdateRequest request) {
 
+        AppointmentResponse response = appointmentService.updateStatus(id, request);
+
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        "Appointment status updated successfully",
-                        appointmentService
-                                .updateStatus(id, request)));
+                        response.status().getDescription(), response));
     }
 
 

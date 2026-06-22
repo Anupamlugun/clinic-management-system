@@ -71,12 +71,10 @@ public class PaymentController {
             @RequestBody
             PaymentUpdateRequest request) {
 
+        PaymentResponse response = paymentService.updatePayment(id, request);
         return ResponseEntity.ok(
                 ApiResponse.success(
-                        "Payment updated successfully",
-                        paymentService.updatePayment(
-                                id,
-                                request)));
+                        response.paymentStatus().getDescription(), response));
     }
 
     @GetMapping("/modes")

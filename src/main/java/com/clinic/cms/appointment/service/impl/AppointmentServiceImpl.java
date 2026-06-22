@@ -17,6 +17,7 @@ import com.clinic.cms.billing.enums.PaymentStatus;
 import com.clinic.cms.billing.repository.PaymentRepository;
 import com.clinic.cms.billing.service.PaymentService;
 import com.clinic.cms.doctor.entity.Doctor;
+import com.clinic.cms.doctor.enums.DoctorStatus;
 import com.clinic.cms.doctor.repository.DoctorRepository;
 import com.clinic.cms.exception.custom.ResourceAlreadyExistsException;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
@@ -69,6 +70,10 @@ public class AppointmentServiceImpl
 
         if (!doctor.getActive()) {
             throw new ValidationException("Doctor is inactive");
+        }
+
+        if (doctor.getStatus() != DoctorStatus.ACTIVE) {
+            throw new ValidationException(doctor.getStatus().getDescription());
         }
 
         AppointmentSlot slot =

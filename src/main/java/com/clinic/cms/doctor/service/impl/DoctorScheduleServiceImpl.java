@@ -1,5 +1,6 @@
 package com.clinic.cms.doctor.service.impl;
 
+import com.clinic.cms.doctor.enums.DoctorStatus;
 import com.clinic.cms.exception.custom.ResourceAlreadyExistsException;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
 import com.clinic.cms.doctor.dto.v1.DoctorScheduleCreateRequest;
@@ -39,6 +40,10 @@ public class DoctorScheduleServiceImpl implements DoctorScheduleService {
 
         if (!doctor.getActive()) {
             throw new ValidationException("Doctor is inactive");
+        }
+
+        if (doctor.getStatus() != DoctorStatus.ACTIVE) {
+            throw new ValidationException(doctor.getStatus().getDescription());
         }
 
         if (scheduleRepository.existsByDoctorIdAndDay(
