@@ -97,6 +97,7 @@ public class PaymentServiceImpl
                 payment);
 
         payment.setPaymentStatus(request.paymentStatus());
+        payment.setReceiptNumber(generateReceiptNumber());
 
         if (request.paymentStatus() == PaymentStatus.COMPLETED) {
             payment.setPaidAt(LocalDateTime.now());

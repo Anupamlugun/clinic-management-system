@@ -12,14 +12,17 @@ import com.clinic.cms.appointment.repository.AppointmentRepository;
 import com.clinic.cms.appointment.repository.AppointmentSlotRepository;
 import com.clinic.cms.appointment.service.AppointmentService;
 import com.clinic.cms.appointment.workflow.AppointmentWorkflowRules;
+import com.clinic.cms.billing.entity.Payment;
+import com.clinic.cms.billing.enums.PaymentStatus;
+import com.clinic.cms.billing.repository.PaymentRepository;
 import com.clinic.cms.billing.service.PaymentService;
 import com.clinic.cms.doctor.entity.Doctor;
 import com.clinic.cms.doctor.repository.DoctorRepository;
 import com.clinic.cms.exception.custom.ResourceAlreadyExistsException;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
+import com.clinic.cms.exception.custom.ValidationException;
 import com.clinic.cms.patient.entity.Patient;
 import com.clinic.cms.patient.repository.PatientRepository;
-import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,6 +42,7 @@ public class AppointmentServiceImpl
     private final AppointmentMapper mapper;
     private final PaymentService paymentService;
     private final AppointmentWorkflowRules appointmentWorkflowRules;
+    private final PaymentRepository paymentRepository;
 
     @Override
     public AppointmentResponse createAppointment(
@@ -184,6 +188,20 @@ public class AppointmentServiceImpl
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Appointment not found"));
+
+        if (request.status() == AppointmentStatus.CHECKED_IN) {
+
+            Payment payment = paymentRepository
+                    .findByAppointmentId(appointment.getId())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException(
+                                    "Payment not found for appointment"));
+
+            if (payment.getPaymentStatus() != PaymentStatus.COMPLETED) {
+                throw new ValidationException(
+                        "Patient cannot be checked in until payment is completed");
+            }
+        }
 
         appointmentWorkflowRules
                 .validateTransition(

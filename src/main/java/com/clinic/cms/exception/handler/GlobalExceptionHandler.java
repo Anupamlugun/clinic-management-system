@@ -4,6 +4,7 @@ import com.clinic.cms.common.dto.v1.ApiResponse;
 import com.clinic.cms.exception.custom.InvalidWorkflowTransitionException;
 import com.clinic.cms.exception.custom.ResourceAlreadyExistsException;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
+import com.clinic.cms.exception.custom.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,6 +32,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidWorkflowTransitionException.class)
     public ResponseEntity<ApiResponse<?>> handleInvalidTransition(
             InvalidWorkflowTransitionException ex) {
+
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ApiResponse<?>> handleValidationException(
+            ValidationException ex) {
+
 
         return ResponseEntity.badRequest()
                 .body(ApiResponse.error(ex.getMessage()));
