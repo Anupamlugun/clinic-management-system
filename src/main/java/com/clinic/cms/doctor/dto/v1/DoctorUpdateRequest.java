@@ -3,6 +3,8 @@ package com.clinic.cms.doctor.dto.v1;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
+
 public record DoctorUpdateRequest(
 
         @Size(max = 100)
@@ -18,6 +20,10 @@ public record DoctorUpdateRequest(
 
         @PositiveOrZero(message = "Experience years cannot be negative")
         Integer experienceYears,
+
+        BigDecimal consultationFee,
+
+        BigDecimal followUpFee,
 
         Boolean active
 

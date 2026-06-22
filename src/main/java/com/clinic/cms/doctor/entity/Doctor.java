@@ -6,6 +6,8 @@ import com.clinic.cms.doctor.enums.DoctorStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(
         name = "doctors",
@@ -52,6 +54,12 @@ public class Doctor extends BaseEntity {
 
     @Column(nullable = false)
     private Integer experienceYears;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal consultationFee;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal followUpFee;
 
     @Builder.Default
     @Column(nullable = false)

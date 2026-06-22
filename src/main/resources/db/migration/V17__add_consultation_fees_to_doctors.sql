@@ -1,0 +1,5 @@
+ALTER TABLE doctors
+    ADD COLUMN consultation_fee NUMERIC(10,2) NOT NULL DEFAULT 500.00;
+
+ALTER TABLE doctors
+    ADD COLUMN follow_up_fee NUMERIC(10,2) NOT NULL DEFAULT 250.00;

@@ -2,6 +2,8 @@ package com.clinic.cms.doctor.dto.v1;
 
 import jakarta.validation.constraints.*;
 
+import java.math.BigDecimal;
+
 public record DoctorCreateRequest(
 
         @NotBlank(message = "First name is required")
@@ -23,6 +25,10 @@ public record DoctorCreateRequest(
 
         @NotNull(message = "Experience years is required")
         @PositiveOrZero(message = "Experience years cannot be negative")
-        Integer experienceYears
+        Integer experienceYears,
+
+        BigDecimal consultationFee,
+
+        BigDecimal followUpFee
 
 ) {}
