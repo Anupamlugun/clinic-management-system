@@ -1,12 +1,12 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/clinic
-    username: postgres
-    password: lugun
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
 logging:
   level:
-    org.hibernate.SQL: DEBUG
+    root: INFO
 
 springdoc:
   api-docs:
@@ -21,5 +21,3 @@ springdoc:
     try-it-out-enabled: true
     display-request-duration: true
     doc-expansion: none
-
-  show-actuator: false

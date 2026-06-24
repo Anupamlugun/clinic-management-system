@@ -3,7 +3,7 @@ spring:
     name: clinic-management-system
 
   profiles:
-    active: dev
+    active: ${ACTIVE_PROFILE}
 
   jpa:
     hibernate:
@@ -41,3 +41,4 @@ clinic:
   billing:
     receipt-prefix: REC
 
+packages-to-scan: com.clinic.cms
