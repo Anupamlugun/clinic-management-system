@@ -28,4 +28,8 @@ public interface AppointmentSlotRepository
     Optional<AppointmentSlot> findByIdAndDoctorId(
             Long slotId,
             Long doctorId);
+
+    Page<AppointmentSlot> findByBookedFalseAndActiveTrue(Pageable pageable);
+
+    Page<AppointmentSlot> findByBookedTrueAndActiveTrue(Pageable pageable);
 }

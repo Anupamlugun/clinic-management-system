@@ -2,12 +2,10 @@ package com.clinic.cms.doctor.controller.v1;
 
 import com.clinic.cms.common.dto.v1.ApiResponse;
 import com.clinic.cms.common.dto.v1.EnumResponse;
-import com.clinic.cms.doctor.dto.v1.DoctorCreateRequest;
-import com.clinic.cms.doctor.dto.v1.DoctorResponse;
-import com.clinic.cms.doctor.dto.v1.DoctorStatusUpdateRequest;
-import com.clinic.cms.doctor.dto.v1.DoctorUpdateRequest;
+import com.clinic.cms.doctor.dto.v1.*;
 import com.clinic.cms.doctor.enums.DoctorStatus;
 import com.clinic.cms.doctor.service.DoctorService;
+import com.clinic.cms.patient.dto.v1.PatientResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -115,5 +113,92 @@ public class DoctorController {
         return ResponseEntity.ok(ApiResponse.success(
                 "Doctor status fetched successfully",
                 doctorStatus));
+    }
+    @GetMapping("/top")
+    @Operation(summary = "Get Top Doctors")
+    public ResponseEntity<ApiResponse<List<DoctorResponse>>> getTopDoctors() {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Top doctors fetched successfully",
+                        doctorService.getTopDoctors()));
+    }
+
+    @GetMapping("/active")
+    @Operation(summary = "Get Active Doctors")
+    public ResponseEntity<ApiResponse<Page<DoctorResponse>>> getActiveDoctors(
+            @ParameterObject
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "id",
+                    direction = Sort.Direction.ASC)
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Active doctors fetched successfully",
+                        doctorService.getActiveDoctors(pageable)));
+    }
+
+    @GetMapping("/inactive")
+    @Operation(summary = "Get Inactive Doctors")
+    public ResponseEntity<ApiResponse<Page<DoctorResponse>>> getInactiveDoctors(
+            @ParameterObject
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "id",
+                    direction = Sort.Direction.ASC)
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Inactive doctors fetched successfully",
+                        doctorService.getInactiveDoctors(pageable)));
+    }
+
+    @GetMapping("/{id}/patients")
+    @Operation(summary = "Get Doctor Patients")
+    public ResponseEntity<ApiResponse<List<PatientResponse>>> getDoctorPatients(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Doctor patients fetched successfully",
+                        doctorService.getDoctorPatients(id)));
+    }
+
+    @GetMapping("/{id}/statistics")
+    @Operation(summary = "Get Doctor Statistics")
+    public ResponseEntity<ApiResponse<DoctorStatisticsResponse>> getDoctorStatistics(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Doctor statistics fetched successfully",
+                        doctorService.getDoctorStatistics(id)));
+    }
+
+    @PatchMapping("/{id}/activate")
+    @Operation(summary = "Activate Doctor")
+    public ResponseEntity<ApiResponse<DoctorResponse>> activateDoctor(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Doctor activated successfully",
+                        doctorService.activateDoctor(id)));
+    }
+
+    @PatchMapping("/{id}/deactivate")
+    @Operation(summary = "Deactivate Doctor")
+    public ResponseEntity<ApiResponse<DoctorResponse>> deactivateDoctor(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Doctor deactivated successfully",
+                        doctorService.deactivateDoctor(id)));
     }
 }

@@ -1,5 +1,11 @@
 package com.clinic.cms.patient.service.impl;
 
+import com.clinic.cms.appointment.dto.v1.AppointmentResponse;
+import com.clinic.cms.appointment.mapper.v1.AppointmentMapper;
+import com.clinic.cms.appointment.repository.AppointmentRepository;
+import com.clinic.cms.billing.dto.v1.PaymentResponse;
+import com.clinic.cms.billing.mapper.v1.PaymentMapper;
+import com.clinic.cms.billing.repository.PaymentRepository;
 import com.clinic.cms.exception.custom.ResourceAlreadyExistsException;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
 import com.clinic.cms.patient.dto.v1.PatientCreateRequest;
@@ -22,6 +28,10 @@ public class PatientServiceImpl implements PatientService {
 
     private final PatientRepository repository;
     private final PatientMapper mapper;
+    private final PaymentRepository paymentRepository;
+    private final PaymentMapper paymentMapper;
+    private final AppointmentRepository appointmentRepository;
+    private final AppointmentMapper appointmentMapper;
 
     @Override
     public PatientResponse createPatient(
@@ -95,5 +105,76 @@ public class PatientServiceImpl implements PatientService {
         patient.setActive(false);
 
         repository.save(patient);
+    }
+
+    @Override
+    public PatientResponse activatePatient(Long id) {
+
+        Patient patient = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Patient not found"));
+
+        patient.setActive(true);
+
+        return mapper.toResponse(repository.save(patient));
+    }
+
+    @Override
+    public PatientResponse deactivatePatient(Long id) {
+
+        Patient patient = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Patient not found"));
+
+        patient.setActive(false);
+
+        return mapper.toResponse(repository.save(patient));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PatientResponse> searchPatients(
+            String keyword,
+            Pageable pageable) {
+
+        if (keyword == null || keyword.isBlank()) {
+            return repository.findAll(pageable)
+                    .map(mapper::toResponse);
+        }
+
+        return repository
+                .findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrPhoneNumberContainingIgnoreCase(
+                        keyword,
+                        keyword,
+                        keyword,
+                        pageable)
+                .map(mapper::toResponse);
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PaymentResponse> getPatientPayments(
+            Long patientId,
+            Pageable pageable) {
+
+        getPatient(patientId);
+
+        return paymentRepository
+                .findByAppointmentPatientId(patientId, pageable)
+                .map(paymentMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AppointmentResponse> getPatientAppointments(
+            Long patientId,
+            Pageable pageable) {
+
+        getPatient(patientId);
+
+        return appointmentRepository
+                .findByPatientId(patientId, pageable)
+                .map(appointmentMapper::toResponse);
     }
 }

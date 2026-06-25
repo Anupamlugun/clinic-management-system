@@ -130,4 +130,38 @@ public class PaymentServiceImpl
                 ? doctor.getFollowUpFee()
                 : doctor.getConsultationFee();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaymentResponse getPaymentByAppointmentId(Long appointmentId) {
+
+        Payment payment = paymentRepository
+                .findByAppointmentId(appointmentId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Payment not found"));
+
+        return paymentMapper.toResponse(payment);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PaymentResponse> getPaymentsByStatus(
+            PaymentStatus status,
+            Pageable pageable) {
+
+        return paymentRepository
+                .findByPaymentStatus(status, pageable)
+                .map(paymentMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PaymentResponse> getRecentPayments(
+            Pageable pageable) {
+
+        return paymentRepository
+                .findAllByOrderByCreatedAtDesc(pageable)
+                .map(paymentMapper::toResponse);
+    }
 }

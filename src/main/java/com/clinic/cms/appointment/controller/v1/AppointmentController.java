@@ -131,4 +131,100 @@ public class AppointmentController {
                         "Appointment statuses fetched successfully",
                         statuses));
     }
+
+    @GetMapping("/by-patient/{patientId}")
+    @Operation(summary = "Get Appointments By Patient")
+    public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getByPatient(
+            @PathVariable Long patientId,
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "appointmentDate")
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Appointments fetched successfully",
+                        appointmentService.getAppointmentsByPatient(patientId, pageable)));
+    }
+
+    @GetMapping("/by-doctor/{doctorId}")
+    @Operation(summary = "Get Appointments By Doctor")
+    public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getByDoctor(
+            @PathVariable Long doctorId,
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "appointmentDate")
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Appointments fetched successfully",
+                        appointmentService.getAppointmentsByDoctor(doctorId, pageable)));
+    }
+
+    @GetMapping("/by-status/{status}")
+    @Operation(summary = "Get Appointments By Status")
+    public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getByStatus(
+            @PathVariable AppointmentStatus status,
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "appointmentDate")
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Appointments fetched successfully",
+                        appointmentService.getAppointmentsByStatus(status, pageable)));
+    }
+
+    @GetMapping("/by-date/{date}")
+    @Operation(summary = "Get Appointments By Date")
+    public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getByDate(
+            @PathVariable java.time.LocalDate date,
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "slot.startTime")
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Appointments fetched successfully",
+                        appointmentService.getAppointmentsByDate(date, pageable)));
+    }
+
+    @GetMapping("/today")
+    @Operation(summary = "Get Today's Appointments")
+    public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getToday(
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "slot.startTime")
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Today's appointments fetched successfully",
+                        appointmentService.getTodayAppointments(pageable)));
+    }
+
+    @GetMapping("/upcoming")
+    @Operation(summary = "Get Upcoming Appointments")
+    public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getUpcoming(
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "appointmentDate")
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Upcoming appointments fetched successfully",
+                        appointmentService.getUpcomingAppointments(pageable)));
+    }
+
+    @GetMapping("/history/{patientId}")
+    @Operation(summary = "Get Patient Appointment History")
+    public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getHistory(
+            @PathVariable Long patientId,
+            @ParameterObject
+            @PageableDefault(size = 10, sort = "appointmentDate", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Appointment history fetched successfully",
+                        appointmentService.getAppointmentHistory(patientId, pageable)));
+    }
 }

@@ -1,5 +1,7 @@
 package com.clinic.cms.patient.controller.v1;
 
+import com.clinic.cms.appointment.dto.v1.AppointmentResponse;
+import com.clinic.cms.billing.dto.v1.PaymentResponse;
 import com.clinic.cms.common.dto.v1.ApiResponse;
 import com.clinic.cms.common.dto.v1.EnumResponse;
 import com.clinic.cms.patient.dto.v1.PatientCreateRequest;
@@ -113,5 +115,81 @@ public class PatientController {
         return ResponseEntity.ok(ApiResponse.success(
                 "Blood groups fetched successfully",
                 bloodGroups));
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Search Patients")
+    public ResponseEntity<ApiResponse<Page<PatientResponse>>> search(
+            @RequestParam(required = false) String keyword,
+            @ParameterObject
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "id",
+                    direction = Sort.Direction.ASC
+            ) Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Patients fetched successfully",
+                        patientService.searchPatients(keyword, pageable)));
+    }
+
+    @GetMapping("/{id}/payments")
+    @Operation(summary = "Fetch Patient Payments")
+    public ResponseEntity<ApiResponse<Page<PaymentResponse>>> getPayments(
+            @PathVariable Long id,
+            @ParameterObject
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "id",
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Patient payments fetched successfully",
+                        patientService.getPatientPayments(id, pageable)));
+    }
+
+    @GetMapping("/{id}/appointments")
+    @Operation(summary = "Fetch Patient Appointments")
+    public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getAppointments(
+            @PathVariable Long id,
+            @ParameterObject
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "appointmentDate",
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Patient appointments fetched successfully",
+                        patientService.getPatientAppointments(id, pageable)));
+    }
+
+    @PatchMapping("/{id}/activate")
+    @Operation(summary = "Activate Patient")
+    public ResponseEntity<ApiResponse<PatientResponse>> activate(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Patient activated successfully",
+                        patientService.activatePatient(id)));
+    }
+
+    @PatchMapping("/{id}/deactivate")
+    @Operation(summary = "Deactivate Patient")
+    public ResponseEntity<ApiResponse<PatientResponse>> deactivate(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Patient deactivated successfully",
+                        patientService.deactivatePatient(id)));
     }
 }

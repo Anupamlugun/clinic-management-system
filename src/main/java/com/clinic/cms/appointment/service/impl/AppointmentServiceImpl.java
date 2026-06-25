@@ -30,6 +30,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -259,5 +261,78 @@ public class AppointmentServiceImpl
             throw new ValidationException(
                     "Parent appointment id can only be provided when followUp is true");
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AppointmentResponse> getAppointmentsByPatient(
+            Long patientId,
+            Pageable pageable) {
+
+        return repository.findByPatientId(patientId, pageable)
+                .map(mapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AppointmentResponse> getAppointmentsByDoctor(
+            Long doctorId,
+            Pageable pageable) {
+
+        return repository.findByDoctorId(doctorId, pageable)
+                .map(mapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AppointmentResponse> getAppointmentsByStatus(
+            AppointmentStatus status,
+            Pageable pageable) {
+
+        return repository.findByStatus(status, pageable)
+                .map(mapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AppointmentResponse> getAppointmentsByDate(
+            LocalDate date,
+            Pageable pageable) {
+
+        return repository.findByAppointmentDate(date, pageable)
+                .map(mapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AppointmentResponse> getTodayAppointments(
+            Pageable pageable) {
+
+        return repository.findByAppointmentDate(LocalDate.now(), pageable)
+                .map(mapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AppointmentResponse> getUpcomingAppointments(
+            Pageable pageable) {
+
+        return repository.findByAppointmentDateGreaterThanEqual(
+                        LocalDate.now(),
+                        pageable)
+                .map(mapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AppointmentResponse> getAppointmentHistory(
+            Long patientId,
+            Pageable pageable) {
+
+        return repository.findByPatientIdAndAppointmentDateLessThan(
+                        patientId,
+                        LocalDate.now(),
+                        pageable)
+                .map(mapper::toResponse);
     }
 }

@@ -10,11 +10,14 @@ import com.clinic.cms.doctor.service.DoctorService;
 import com.clinic.cms.exception.custom.ResourceAlreadyExistsException;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
 import com.clinic.cms.exception.custom.ValidationException;
+import com.clinic.cms.patient.dto.v1.PatientResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -127,6 +130,66 @@ public class DoctorServiceImpl implements DoctorService {
 
         doctor.setStatus(request.status());
         return mapper.toResponse(repository.save(doctor));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<DoctorResponse> getTopDoctors() {
+
+        return repository.findTop5ByActiveTrueOrderByExperienceYearsDesc()
+                .stream()
+                .map(mapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<DoctorResponse> getActiveDoctors(Pageable pageable) {
+
+        return repository.findByActiveTrue(pageable)
+                .map(mapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<DoctorResponse> getInactiveDoctors(Pageable pageable) {
+
+        return repository.findByActiveFalse(pageable)
+                .map(mapper::toResponse);
+    }
+
+    @Override
+    public DoctorResponse activateDoctor(Long id) {
+
+        Doctor doctor = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Doctor not found"));
+
+        doctor.setActive(true);
+
+        return mapper.toResponse(repository.save(doctor));
+    }
+
+    @Override
+    public DoctorResponse deactivateDoctor(Long id) {
+
+        Doctor doctor = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Doctor not found"));
+
+        doctor.setActive(false);
+
+        return mapper.toResponse(repository.save(doctor));
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public List<PatientResponse> getDoctorPatients(Long doctorId) {
+        throw new UnsupportedOperationException("To be implemented");
+    }
+
+    @Override
+    public DoctorStatisticsResponse getDoctorStatistics(Long doctorId) {
+        return null;
     }
 
 }

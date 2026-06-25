@@ -75,4 +75,48 @@ public class AppointmentSlotController {
                                 slotDate,
                                 pageable)));
     }
+
+    @GetMapping("/available")
+    @Operation(summary = "Get Available Appointment Slots")
+    public ResponseEntity<ApiResponse<Page<AppointmentSlotResponse>>> getAvailableSlots(
+            @ParameterObject Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Available appointment slots fetched successfully",
+                        service.getAvailableSlots(pageable)));
+    }
+
+    @GetMapping("/booked")
+    @Operation(summary = "Get Booked Appointment Slots")
+    public ResponseEntity<ApiResponse<Page<AppointmentSlotResponse>>> getBookedSlots(
+            @ParameterObject Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Booked appointment slots fetched successfully",
+                        service.getBookedSlots(pageable)));
+    }
+
+    @PatchMapping("/{id}/activate")
+    @Operation(summary = "Activate Appointment Slot")
+    public ResponseEntity<ApiResponse<AppointmentSlotResponse>> activateSlot(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Appointment slot activated successfully",
+                        service.activateSlot(id)));
+    }
+
+    @PatchMapping("/{id}/deactivate")
+    @Operation(summary = "Deactivate Appointment Slot")
+    public ResponseEntity<ApiResponse<AppointmentSlotResponse>> deactivateSlot(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Appointment slot deactivated successfully",
+                        service.deactivateSlot(id)));
+    }
 }

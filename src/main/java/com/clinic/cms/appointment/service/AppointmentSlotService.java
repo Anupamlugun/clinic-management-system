@@ -17,4 +17,12 @@ public interface AppointmentSlotService {
             Long doctorId,
             LocalDate slotDate,
             Pageable pageable);
+
+    Page<AppointmentSlotResponse> getAvailableSlots(Pageable pageable);
+
+    Page<AppointmentSlotResponse> getBookedSlots(Pageable pageable);
+
+    AppointmentSlotResponse activateSlot(Long id);
+
+    AppointmentSlotResponse deactivateSlot(Long id);
 }

@@ -58,4 +58,46 @@ public class AppointmentSlotServiceImpl
                         pageable)
                 .map(mapper::toResponse);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AppointmentSlotResponse> getAvailableSlots(Pageable pageable) {
+
+        return repository.findByBookedFalseAndActiveTrue(pageable)
+                .map(mapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AppointmentSlotResponse> getBookedSlots(Pageable pageable) {
+
+        return repository.findByBookedTrueAndActiveTrue(pageable)
+                .map(mapper::toResponse);
+    }
+
+    @Override
+    public AppointmentSlotResponse activateSlot(Long id) {
+
+        AppointmentSlot slot = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Appointment slot not found"));
+
+        slot.setActive(true);
+
+        return mapper.toResponse(repository.save(slot));
+    }
+
+    @Override
+    public AppointmentSlotResponse deactivateSlot(Long id) {
+
+        AppointmentSlot slot = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Appointment slot not found"));
+
+        slot.setActive(false);
+
+        return mapper.toResponse(repository.save(slot));
+    }
 }

@@ -3,6 +3,7 @@ package com.clinic.cms.billing.controller.v1;
 import com.clinic.cms.billing.dto.v1.PaymentResponse;
 import com.clinic.cms.billing.dto.v1.PaymentUpdateRequest;
 import com.clinic.cms.billing.enums.PaymentMode;
+import com.clinic.cms.billing.enums.PaymentStatus;
 import com.clinic.cms.billing.service.PaymentService;
 import com.clinic.cms.common.dto.v1.ApiResponse;
 import com.clinic.cms.common.dto.v1.EnumResponse;
@@ -94,5 +95,90 @@ public class PaymentController {
                 ApiResponse.success(
                         "Payment modes fetched successfully",
                         modes));
+    }
+
+    @GetMapping("/by-appointment/{appointmentId}")
+    @Operation(summary = "Get Payment By Appointment Id")
+    public ResponseEntity<ApiResponse<PaymentResponse>> getByAppointment(
+            @PathVariable Long appointmentId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Payment fetched successfully",
+                        paymentService.getPaymentByAppointmentId(appointmentId)));
+    }
+
+    @GetMapping("/completed")
+    @Operation(summary = "Get Completed Payments")
+    public ResponseEntity<ApiResponse<Page<PaymentResponse>>> getCompletedPayments(
+            @ParameterObject
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "paidAt",
+                    direction = Sort.Direction.DESC)
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Completed payments fetched successfully",
+                        paymentService.getPaymentsByStatus(
+                                PaymentStatus.COMPLETED,
+                                pageable)));
+    }
+
+    @GetMapping("/pending")
+    @Operation(summary = "Get Pending Payments")
+    public ResponseEntity<ApiResponse<Page<PaymentResponse>>> getPendingPayments(
+            @ParameterObject
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC)
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Pending payments fetched successfully",
+                        paymentService.getPaymentsByStatus(
+                                PaymentStatus.PENDING,
+                                pageable)));
+    }
+
+    @GetMapping("/failed")
+    @Operation(summary = "Get Failed Payments")
+    public ResponseEntity<ApiResponse<Page<PaymentResponse>>> getFailedPayments(
+            @ParameterObject
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "updatedAt",
+                    direction = Sort.Direction.DESC)
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Failed payments fetched successfully",
+                        paymentService.getPaymentsByStatus(
+                                PaymentStatus.FAILED,
+                                pageable)));
+    }
+
+    @GetMapping("/recent")
+    @Operation(summary = "Get Recent Payments")
+    public ResponseEntity<ApiResponse<Page<PaymentResponse>>> getRecentPayments(
+            @ParameterObject
+            @PageableDefault(
+                    page = 0,
+                    size = 10,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC)
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Recent payments fetched successfully",
+                        paymentService.getRecentPayments(pageable)));
     }
 }
