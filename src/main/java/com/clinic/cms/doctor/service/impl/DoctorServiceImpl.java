@@ -1,5 +1,7 @@
 package com.clinic.cms.doctor.service.impl;
 
+import com.clinic.cms.appointment.enums.AppointmentStatus;
+import com.clinic.cms.appointment.repository.AppointmentRepository;
 import com.clinic.cms.doctor.dto.v1.*;
 import com.clinic.cms.doctor.entity.Doctor;
 import com.clinic.cms.doctor.entity.DoctorSpecialization;
@@ -11,12 +13,14 @@ import com.clinic.cms.exception.custom.ResourceAlreadyExistsException;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
 import com.clinic.cms.exception.custom.ValidationException;
 import com.clinic.cms.patient.dto.v1.PatientResponse;
+import com.clinic.cms.patient.mapper.v1.PatientMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -27,6 +31,8 @@ public class DoctorServiceImpl implements DoctorService {
     private final DoctorRepository repository;
     private final DoctorMapper mapper;
     private final DoctorSpecializationRepository specializationRepository;
+    private final AppointmentRepository appointmentRepository;
+    private final PatientMapper patientMapper;
 
     @Override
     public DoctorResponse createDoctor(
@@ -184,12 +190,41 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     @Transactional(readOnly = true)
     public List<PatientResponse> getDoctorPatients(Long doctorId) {
-        throw new UnsupportedOperationException("To be implemented");
+        return appointmentRepository.findPatientsByDoctorId(doctorId)
+                .stream()
+                .map(patientMapper::toResponse)
+                .toList();
     }
 
     @Override
     public DoctorStatisticsResponse getDoctorStatistics(Long doctorId) {
-        return null;
+        long totalAppointments = appointmentRepository.countByDoctorId(doctorId);
+
+        long completedAppointments =
+                appointmentRepository.countByDoctorIdAndStatus(
+                        doctorId,
+                        AppointmentStatus.COMPLETED);
+
+        long cancelledAppointments =
+                appointmentRepository.countByDoctorIdAndStatus(
+                        doctorId,
+                        AppointmentStatus.CANCELLED);
+
+        long todayAppointments =
+                appointmentRepository.countByDoctorIdAndAppointmentDate(
+                        doctorId,
+                        LocalDate.now());
+
+        long totalPatients =
+                appointmentRepository.countDistinctPatientsByDoctorId(doctorId);
+
+        return new DoctorStatisticsResponse(
+                totalAppointments,
+                completedAppointments,
+                cancelledAppointments,
+                todayAppointments,
+                totalPatients
+        );
     }
 
 }

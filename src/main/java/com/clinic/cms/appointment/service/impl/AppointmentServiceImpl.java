@@ -10,6 +10,7 @@ import com.clinic.cms.appointment.enums.AppointmentStatus;
 import com.clinic.cms.appointment.mapper.v1.AppointmentMapper;
 import com.clinic.cms.appointment.repository.AppointmentRepository;
 import com.clinic.cms.appointment.repository.AppointmentSlotRepository;
+import com.clinic.cms.appointment.repository.PrescriptionRepository;
 import com.clinic.cms.appointment.service.AppointmentService;
 import com.clinic.cms.appointment.workflow.AppointmentWorkflowRules;
 import com.clinic.cms.billing.entity.Payment;
@@ -46,6 +47,7 @@ public class AppointmentServiceImpl
     private final PaymentService paymentService;
     private final AppointmentWorkflowRules appointmentWorkflowRules;
     private final PaymentRepository paymentRepository;
+    private final PrescriptionRepository prescriptionRepository;
 
     @Override
     public AppointmentResponse createAppointment(
@@ -223,6 +225,14 @@ public class AppointmentServiceImpl
             if (payment.getPaymentStatus() != PaymentStatus.COMPLETED) {
                 throw new ValidationException(
                         "Patient cannot be checked in until payment is completed");
+            }
+        }
+
+        if (request.status() == AppointmentStatus.COMPLETED) {
+
+            if (!prescriptionRepository.existsByAppointmentId(appointment.getId())) {
+                throw new ValidationException(
+                        "Prescription must be generated before completing the appointment");
             }
         }
 

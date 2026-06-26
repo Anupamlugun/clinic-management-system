@@ -2,9 +2,11 @@ package com.clinic.cms.appointment.repository;
 
 import com.clinic.cms.appointment.entity.Appointment;
 import com.clinic.cms.appointment.enums.AppointmentStatus;
+import com.clinic.cms.patient.entity.Patient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -38,4 +40,25 @@ public interface AppointmentRepository
             Long patientId,
             LocalDate date,
             Pageable pageable);
+
+    @Query("""
+            SELECT DISTINCT a.patient
+            FROM Appointment a
+            WHERE a.doctor.id = :doctorId
+            ORDER BY a.patient.firstName, a.patient.lastName
+            """)
+    List<Patient> findPatientsByDoctorId(Long doctorId);
+
+    long countByDoctorId(Long doctorId);
+
+    long countByDoctorIdAndStatus(Long doctorId, AppointmentStatus status);
+
+    long countByDoctorIdAndAppointmentDate(Long doctorId, LocalDate appointmentDate);
+
+    @Query("""
+            SELECT COUNT(DISTINCT a.patient.id)
+            FROM Appointment a
+            WHERE a.doctor.id = :doctorId
+            """)
+    long countDistinctPatientsByDoctorId(Long doctorId);
 }
