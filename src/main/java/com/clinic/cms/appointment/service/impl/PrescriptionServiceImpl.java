@@ -5,6 +5,7 @@ import com.clinic.cms.appointment.dto.v1.PrescriptionResponse;
 import com.clinic.cms.appointment.dto.v1.PrescriptionUpdateRequest;
 import com.clinic.cms.appointment.entity.Appointment;
 import com.clinic.cms.appointment.entity.Prescription;
+import com.clinic.cms.appointment.enums.AppointmentStatus;
 import com.clinic.cms.appointment.mapper.v1.PrescriptionMapper;
 import com.clinic.cms.appointment.repository.AppointmentRepository;
 import com.clinic.cms.appointment.repository.PrescriptionMedicineRepository;
@@ -49,6 +50,10 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Appointment not found"));
+
+        if (request.followUpDate() != null) {
+            appointment.setStatus(AppointmentStatus.FOLLOW_UP_SCHEDULED);
+        }
 
         Doctor doctor = doctorRepository
                 .findById(request.doctorId())
@@ -112,6 +117,17 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "Prescription not found"));
+
+
+        Appointment appointment = appointmentRepository
+                .findById(prescription.getAppointment().getId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Appointment not found"));
+
+        if (request.followUpDate() != null) {
+            appointment.setStatus(AppointmentStatus.FOLLOW_UP_SCHEDULED);
+        }
 
         mapper.updateEntityFromRequest(
                 request,

@@ -42,3 +42,19 @@ clinic:
     receipt-prefix: REC
 
 packages-to-scan: com.clinic.cms
+
+spring doc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    try-it-out-enabled: true
+    display-request-duration: true
+    doc-expansion: none
+
+  show-actuator: false

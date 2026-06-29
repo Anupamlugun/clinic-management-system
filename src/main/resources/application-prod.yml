@@ -7,17 +7,3 @@ spring:
 logging:
   level:
     root: INFO
-
-springdoc:
-  api-docs:
-    enabled: true
-    path: /v3/api-docs
-
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui.html
-    operations-sorter: method
-    tags-sorter: alpha
-    try-it-out-enabled: true
-    display-request-duration: true
-    doc-expansion: none

@@ -1,6 +1,7 @@
 package com.clinic.cms.billing.service.impl;
 
 import com.clinic.cms.appointment.entity.Appointment;
+import com.clinic.cms.appointment.enums.AppointmentStatus;
 import com.clinic.cms.appointment.repository.AppointmentRepository;
 import com.clinic.cms.billing.dto.v1.PaymentResponse;
 import com.clinic.cms.billing.dto.v1.PaymentUpdateRequest;
@@ -13,6 +14,7 @@ import com.clinic.cms.billing.workflow.PaymentWorkflowRules;
 import com.clinic.cms.config.properties.BillingProperties;
 import com.clinic.cms.doctor.entity.Doctor;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
+import com.clinic.cms.exception.custom.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -87,6 +89,16 @@ public class PaymentServiceImpl
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Payment not found"));
+        AppointmentStatus appointmentStatus =
+                payment.getAppointment().getStatus();
+
+        if (appointmentStatus == AppointmentStatus.CANCELLED
+                || appointmentStatus == AppointmentStatus.NO_SHOW) {
+
+            throw new ValidationException(
+                    "Payment cannot be updated because "
+                            + appointmentStatus.getDisplayName());
+        }
 
         paymentWorkflowRules.validateTransition(
                 payment.getPaymentStatus(),
