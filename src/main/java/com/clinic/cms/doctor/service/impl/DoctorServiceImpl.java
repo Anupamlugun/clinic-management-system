@@ -2,6 +2,9 @@ package com.clinic.cms.doctor.service.impl;
 
 import com.clinic.cms.appointment.enums.AppointmentStatus;
 import com.clinic.cms.appointment.repository.AppointmentRepository;
+import com.clinic.cms.auth.dto.v1.request.UserCreateRequest;
+import com.clinic.cms.auth.entity.User;
+import com.clinic.cms.auth.service.UserService;
 import com.clinic.cms.doctor.dto.v1.*;
 import com.clinic.cms.doctor.entity.Doctor;
 import com.clinic.cms.doctor.entity.DoctorSpecialization;
@@ -17,11 +20,13 @@ import com.clinic.cms.patient.mapper.v1.PatientMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +38,8 @@ public class DoctorServiceImpl implements DoctorService {
     private final DoctorSpecializationRepository specializationRepository;
     private final AppointmentRepository appointmentRepository;
     private final PatientMapper patientMapper;
+    private final UserService userService;
+    private  final PasswordEncoder passwordEncoder;
 
     @Override
     public DoctorResponse createDoctor(
@@ -59,8 +66,19 @@ public class DoctorServiceImpl implements DoctorService {
 
         doctor.setSpecialization(specialization);
 
-        return mapper.toResponse(
-                repository.save(doctor));
+        Doctor savedDoctor = repository.save(doctor);
+
+        User userRequest = User.builder()
+                .username("DOC" + savedDoctor.getId())
+                .email(savedDoctor.getEmail())
+                .password(passwordEncoder.encode("1234"))
+                .roleIds(Set.of(2L))
+                .build();
+
+        User savedUser = userService.createUser(userRequest);
+        savedDoctor.setUser(savedUser);
+
+        return mapper.toResponse(savedDoctor);
     }
 
     @Override

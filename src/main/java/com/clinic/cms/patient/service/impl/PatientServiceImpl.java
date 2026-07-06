@@ -3,6 +3,8 @@ package com.clinic.cms.patient.service.impl;
 import com.clinic.cms.appointment.dto.v1.AppointmentResponse;
 import com.clinic.cms.appointment.mapper.v1.AppointmentMapper;
 import com.clinic.cms.appointment.repository.AppointmentRepository;
+import com.clinic.cms.auth.entity.User;
+import com.clinic.cms.auth.service.UserService;
 import com.clinic.cms.billing.dto.v1.PaymentResponse;
 import com.clinic.cms.billing.mapper.v1.PaymentMapper;
 import com.clinic.cms.billing.repository.PaymentRepository;
@@ -18,8 +20,11 @@ import com.clinic.cms.patient.service.PatientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +37,8 @@ public class PatientServiceImpl implements PatientService {
     private final PaymentMapper paymentMapper;
     private final AppointmentRepository appointmentRepository;
     private final AppointmentMapper appointmentMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
     @Override
     public PatientResponse createPatient(
@@ -44,8 +51,18 @@ public class PatientServiceImpl implements PatientService {
 
         Patient patient = mapper.toEntity(request);
 
-        return mapper.toResponse(
-                repository.save(patient));
+        Patient savedPatient = repository.save(patient);
+
+        User userRequest = User.builder()
+                .username("PAT" + savedPatient.getId())
+                .email(savedPatient.getEmail())
+                .password(passwordEncoder.encode("1234"))
+                .roleIds(Set.of(4L))
+                .build();
+
+        User savedUser = userService.createUser(userRequest);
+        savedPatient.setUser(savedUser);
+        return mapper.toResponse(savedPatient);
     }
 
     @Override

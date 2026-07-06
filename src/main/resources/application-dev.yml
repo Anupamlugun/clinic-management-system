@@ -4,6 +4,12 @@ spring:
     username: postgres
     password: lugun
 
+clinic:
+  security:
+    secret: YjQzZDc5N2I2OWJkODU2YjNlM2E4ZmVjMTE0M2MzNmYzZTM5NjFjNzQzNjE3M2RjNjJkYTY4NTE5OWFkMWUwMw==
+    access-token-expiration: 900000
+    refresh-token-expiration: 604800000
+
   jpa:
     properties:
       hibernate:
