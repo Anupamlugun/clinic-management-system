@@ -1,6 +1,9 @@
 package com.clinic.cms.auth.security;
 
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
 
 public interface JwtService {
 
@@ -10,9 +13,11 @@ public interface JwtService {
 
     String extractUsername(String token);
 
-    boolean isTokenValid(String token, UserDetails userDetails);
+    boolean isTokenValid(String token);
 
     long getAccessTokenExpiration();
 
     long getRefreshTokenExpiration();
+
+    Collection<? extends GrantedAuthority> extractAuthorities(String token);
 }

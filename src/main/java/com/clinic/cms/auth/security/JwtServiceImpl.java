@@ -8,11 +8,16 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 
 @Service
@@ -32,10 +37,17 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String generateAccessToken(UserDetails userDetails) {
 
+        List<String> authorities = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
         return Jwts.builder()
                 .subject(userDetails.getUsername())
+                .claim("authorities", authorities)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + securityProperties.getAccessTokenExpiration()))
+                .expiration(new Date(System.currentTimeMillis()
+                        + securityProperties.getAccessTokenExpiration()))
                 .signWith(secretKey)
                 .compact();
     }
@@ -43,10 +55,17 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String generateRefreshToken(UserDetails userDetails) {
 
+        List<String> authorities = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
         return Jwts.builder()
                 .subject(userDetails.getUsername())
+                .claim("authorities", authorities)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + securityProperties.getRefreshTokenExpiration()))
+                .expiration(new Date(System.currentTimeMillis()
+                        + securityProperties.getRefreshTokenExpiration()))
                 .signWith(secretKey)
                 .compact();
     }
@@ -57,12 +76,12 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-
-        String username = extractUsername(token);
-
-        return username.equals(userDetails.getUsername())
-                && !isTokenExpired(token);
+    public boolean isTokenValid(String token) {
+        try {
+            return !isTokenExpired(token);
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     @Override
@@ -73,6 +92,23 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public long getRefreshTokenExpiration() {
         return securityProperties.getRefreshTokenExpiration();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> extractAuthorities(String token) {
+
+        List<String> authorities = extractClaim(
+                token,
+                claims -> claims.get("authorities", List.class)
+        );
+
+        if (authorities == null) {
+            return Collections.emptyList();
+        }
+
+        return authorities.stream()
+                .map(SimpleGrantedAuthority::new)
+                .toList();
     }
 
     private boolean isTokenExpired(String token) {

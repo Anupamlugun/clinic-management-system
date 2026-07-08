@@ -74,7 +74,7 @@ public class AuthServiceImpl implements AuthService {
 
         UserDetails userDetails = new com.clinic.cms.auth.security.CustomUserDetails(user);
 
-        if (!jwtService.isTokenValid(refreshToken, userDetails)) {
+        if (!jwtService.isTokenValid(refreshToken)) {
             throw new IllegalArgumentException("Invalid refresh token.");
         }
 
