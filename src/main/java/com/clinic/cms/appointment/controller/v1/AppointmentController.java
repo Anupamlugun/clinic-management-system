@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -34,6 +35,7 @@ public class AppointmentController {
 
     @PostMapping
     @Operation(summary = "Create Appointment")
+    @PreAuthorize("hasAuthority('CREATE_APPOINTMENT')")
     public ResponseEntity<ApiResponse<AppointmentResponse>>
     create(
             @Valid
@@ -49,6 +51,7 @@ public class AppointmentController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get Appointment By Id")
+    @PreAuthorize("hasAuthority('VIEW_APPOINTMENT')")
     public ResponseEntity<ApiResponse<AppointmentResponse>>
     get(@PathVariable Long id) {
 
@@ -61,6 +64,7 @@ public class AppointmentController {
 
     @GetMapping
     @Operation(summary = "Get All Appointments")
+    @PreAuthorize("hasAuthority('VIEW_ALL_APPOINTMENTS')")
     public ResponseEntity<ApiResponse<Page<AppointmentResponse>>>
     getAll(
             @ParameterObject
@@ -81,6 +85,7 @@ public class AppointmentController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update Appointment")
+    @PreAuthorize("hasAuthority('UPDATE_APPOINTMENT')")
     public ResponseEntity<ApiResponse<AppointmentResponse>>
     update(
             @PathVariable Long id,
@@ -97,6 +102,7 @@ public class AppointmentController {
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Update Appointment Status")
+    @PreAuthorize("hasAuthority('UPDATE_APPOINTMENT_STATUS')")
     public ResponseEntity<ApiResponse<AppointmentResponse>>
     updateStatus(
             @PathVariable Long id,
@@ -114,6 +120,7 @@ public class AppointmentController {
 
     @GetMapping("/status")
     @Operation(summary = "Get Appointment Status")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<List<EnumResponse>>>
     getStatuses() {
 
@@ -134,6 +141,7 @@ public class AppointmentController {
 
     @GetMapping("/by-patient/{patientId}")
     @Operation(summary = "Get Appointments By Patient")
+    @PreAuthorize("hasAuthority('VIEW_APPOINTMENT')")
     public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getByPatient(
             @PathVariable Long patientId,
             @ParameterObject
@@ -148,6 +156,7 @@ public class AppointmentController {
 
     @GetMapping("/by-doctor/{doctorId}")
     @Operation(summary = "Get Appointments By Doctor")
+    @PreAuthorize("hasAuthority('VIEW_APPOINTMENT')")
     public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getByDoctor(
             @PathVariable Long doctorId,
             @ParameterObject
@@ -162,6 +171,7 @@ public class AppointmentController {
 
     @GetMapping("/by-status/{status}")
     @Operation(summary = "Get Appointments By Status")
+    @PreAuthorize("hasAuthority('VIEW_ALL_APPOINTMENTS')")
     public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getByStatus(
             @PathVariable AppointmentStatus status,
             @ParameterObject
@@ -176,6 +186,7 @@ public class AppointmentController {
 
     @GetMapping("/by-date/{date}")
     @Operation(summary = "Get Appointments By Date")
+    @PreAuthorize("hasAuthority('VIEW_ALL_APPOINTMENTS')")
     public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getByDate(
             @PathVariable java.time.LocalDate date,
             @ParameterObject
@@ -190,6 +201,7 @@ public class AppointmentController {
 
     @GetMapping("/today")
     @Operation(summary = "Get Today's Appointments")
+    @PreAuthorize("hasAuthority('VIEW_ALL_APPOINTMENTS')")
     public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getToday(
             @ParameterObject
             @PageableDefault(size = 10, sort = "slot.startTime")
@@ -216,6 +228,7 @@ public class AppointmentController {
 
     @GetMapping("/history/{patientId}")
     @Operation(summary = "Get Patient Appointment History")
+    @PreAuthorize("hasAuthority('VIEW_APPOINTMENT')")
     public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getHistory(
             @PathVariable Long patientId,
             @ParameterObject

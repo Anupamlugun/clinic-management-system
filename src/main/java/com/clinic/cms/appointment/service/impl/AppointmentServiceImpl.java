@@ -13,6 +13,7 @@ import com.clinic.cms.appointment.repository.AppointmentSlotRepository;
 import com.clinic.cms.appointment.repository.PrescriptionRepository;
 import com.clinic.cms.appointment.service.AppointmentService;
 import com.clinic.cms.appointment.workflow.AppointmentWorkflowRules;
+import com.clinic.cms.auth.security.CurrentUserService;
 import com.clinic.cms.billing.entity.Payment;
 import com.clinic.cms.billing.enums.PaymentStatus;
 import com.clinic.cms.billing.repository.PaymentRepository;
@@ -28,6 +29,7 @@ import com.clinic.cms.patient.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +50,7 @@ public class AppointmentServiceImpl
     private final AppointmentWorkflowRules appointmentWorkflowRules;
     private final PaymentRepository paymentRepository;
     private final PrescriptionRepository prescriptionRepository;
+    private final CurrentUserService currentUserService;
 
     @Override
     public AppointmentResponse createAppointment(
@@ -139,6 +142,8 @@ public class AppointmentServiceImpl
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Appointment not found"));
+
+        validateViewPermission(appointment);
 
         return mapper.toResponse(appointment);
     }
@@ -344,5 +349,38 @@ public class AppointmentServiceImpl
                         LocalDate.now(),
                         pageable)
                 .map(mapper::toResponse);
+    }
+
+    private void validateViewPermission(Appointment appointment) {
+
+        // Admin & Receptionist can view any appointment
+        if (currentUserService.hasRole("SYSTEM_ADMIN")
+                || currentUserService.hasRole("RECEPTIONIST")) {
+            return;
+        }
+
+        Long currentUserId = currentUserService.getUserId();
+
+        // Doctor can view only assigned appointment
+        if (currentUserService.hasRole("DOCTOR")) {
+
+            if (!appointment.getDoctor().getUser().getId().equals(currentUserId)) {
+                throw new AccessDeniedException("You are not authorized to view this appointment.");
+            }
+
+            return;
+        }
+
+        // Patient can view only own appointment
+        if (currentUserService.hasRole("PATIENT")) {
+
+            if (!appointment.getPatient().getUser().getId().equals(currentUserId)) {
+                throw new AccessDeniedException("You are not authorized to view this appointment.");
+            }
+
+            return;
+        }
+
+        throw new AccessDeniedException("Access denied.");
     }
 }
