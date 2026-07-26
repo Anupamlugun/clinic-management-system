@@ -20,4 +20,6 @@ public interface JwtService {
     long getRefreshTokenExpiration();
 
     Collection<? extends GrantedAuthority> extractAuthorities(String token);
+
+    long getRemainingExpiration(String token);
 }

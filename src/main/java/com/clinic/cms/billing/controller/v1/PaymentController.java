@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -35,6 +36,10 @@ public class PaymentController {
 
 
     @GetMapping("/{id}")
+    @PreAuthorize("""
+    hasAuthority('VIEW_PAYMENT') and
+    hasAnyRole('SYSTEM_ADMIN','RECEPTIONIST','DOCTOR','PATIENT')
+    """)
     @Operation(summary = "Get Payment By Id")
     public ResponseEntity<ApiResponse<PaymentResponse>>
     get(@PathVariable Long id) {
@@ -46,6 +51,10 @@ public class PaymentController {
     }
 
     @GetMapping
+    @PreAuthorize("""
+    hasAuthority('VIEW_ALL_PAYMENTS') and
+    hasAnyRole('SYSTEM_ADMIN','RECEPTIONIST')
+    """)
     @Operation(summary = "Get All Payments")
     public ResponseEntity<ApiResponse<Page<PaymentResponse>>>
     getAll(
@@ -64,6 +73,10 @@ public class PaymentController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("""
+    hasAuthority('UPDATE_PAYMENT') and
+    hasAnyRole('SYSTEM_ADMIN','RECEPTIONIST')
+    """)
     @Operation(summary = "Update Payment")
     public ResponseEntity<ApiResponse<PaymentResponse>>
     update(
@@ -79,6 +92,10 @@ public class PaymentController {
     }
 
     @GetMapping("/modes")
+    @PreAuthorize("""
+    hasAuthority('VIEW_PAYMENT') and
+    hasAnyRole('SYSTEM_ADMIN','RECEPTIONIST','DOCTOR','PATIENT')
+    """)
     @Operation(summary = "Get Payment Modes")
     public ResponseEntity<ApiResponse<List<EnumResponse>>>
     getPaymentModes() {
@@ -98,6 +115,10 @@ public class PaymentController {
     }
 
     @GetMapping("/by-appointment/{appointmentId}")
+    @PreAuthorize("""
+    hasAuthority('VIEW_PAYMENT') and
+    hasAnyRole('SYSTEM_ADMIN','RECEPTIONIST','DOCTOR','PATIENT')
+    """)
     @Operation(summary = "Get Payment By Appointment Id")
     public ResponseEntity<ApiResponse<PaymentResponse>> getByAppointment(
             @PathVariable Long appointmentId) {
@@ -109,6 +130,10 @@ public class PaymentController {
     }
 
     @GetMapping("/completed")
+    @PreAuthorize("""
+    hasAuthority('VIEW_ALL_PAYMENTS') and
+    hasAnyRole('SYSTEM_ADMIN','RECEPTIONIST')
+    """)
     @Operation(summary = "Get Completed Payments")
     public ResponseEntity<ApiResponse<Page<PaymentResponse>>> getCompletedPayments(
             @ParameterObject
@@ -128,6 +153,10 @@ public class PaymentController {
     }
 
     @GetMapping("/pending")
+    @PreAuthorize("""
+    hasAuthority('VIEW_ALL_PAYMENTS') and
+    hasAnyRole('SYSTEM_ADMIN','RECEPTIONIST')
+    """)
     @Operation(summary = "Get Pending Payments")
     public ResponseEntity<ApiResponse<Page<PaymentResponse>>> getPendingPayments(
             @ParameterObject
@@ -147,6 +176,10 @@ public class PaymentController {
     }
 
     @GetMapping("/failed")
+    @PreAuthorize("""
+    hasAuthority('VIEW_ALL_PAYMENTS') and
+    hasAnyRole('SYSTEM_ADMIN','RECEPTIONIST')
+    """)
     @Operation(summary = "Get Failed Payments")
     public ResponseEntity<ApiResponse<Page<PaymentResponse>>> getFailedPayments(
             @ParameterObject
@@ -166,6 +199,10 @@ public class PaymentController {
     }
 
     @GetMapping("/recent")
+    @PreAuthorize("""
+    hasAuthority('VIEW_ALL_PAYMENTS') and
+    hasAnyRole('SYSTEM_ADMIN','RECEPTIONIST')
+    """)
     @Operation(summary = "Get Recent Payments")
     public ResponseEntity<ApiResponse<Page<PaymentResponse>>> getRecentPayments(
             @ParameterObject

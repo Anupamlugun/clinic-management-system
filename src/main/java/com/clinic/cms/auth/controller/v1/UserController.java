@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class UserController {
 
 
     @PostMapping
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('CREATE_USER')")
     @Operation(summary = "Create user")
     public ResponseEntity<ApiResponse<UserResponse>> create(
             @Valid @RequestBody UserCreateRequest request) {
@@ -38,6 +40,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('UPDATE_USER')")
     @Operation(summary = "Update user")
     public ResponseEntity<ApiResponse<UserResponse>> update(
             @PathVariable Long id,
@@ -52,6 +55,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('VIEW_USER')")
     @Operation(summary = "Get user by ID")
     public ResponseEntity<ApiResponse<UserResponse>> getById(
             @PathVariable Long id) {
@@ -65,6 +69,7 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('VIEW_ALL_USERS')")
     @Operation(summary = "Get all users")
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAll() {
 
@@ -77,6 +82,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('DELETE_USER')")
     @Operation(summary = "Delete user")
     public ResponseEntity<ApiResponse<Void>> delete(
             @PathVariable Long id) {
@@ -89,6 +95,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/activate")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('ACTIVATE_USER')")
     @Operation(summary = "Activate user")
     public ResponseEntity<ApiResponse<Void>> activate(
             @PathVariable Long id) {
@@ -101,6 +108,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/deactivate")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('DEACTIVATE_USER')")
     @Operation(summary = "Deactivate user")
     public ResponseEntity<ApiResponse<Void>> deactivate(
             @PathVariable Long id) {
@@ -113,6 +121,7 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/roles")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('ASSIGN_ROLE')")
     @Operation(summary = "Assign roles to user")
     public ResponseEntity<ApiResponse<Void>> assignRoles(
             @PathVariable Long userId,
@@ -126,6 +135,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}/roles/{roleId}")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('ASSIGN_ROLE')")
     @Operation(summary = "Remove role from user")
     public ResponseEntity<ApiResponse<Void>> removeRole(
             @PathVariable Long userId,

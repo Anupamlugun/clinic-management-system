@@ -21,4 +21,6 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     Page<Doctor> findByActiveFalse(Pageable pageable);
 
     List<Doctor> findTop5ByActiveTrueOrderByExperienceYearsDesc();
+
+    Optional<Doctor> findByUserId(Long userId);
 }

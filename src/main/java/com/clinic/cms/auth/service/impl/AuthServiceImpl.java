@@ -7,6 +7,7 @@ import com.clinic.cms.auth.entity.User;
 import com.clinic.cms.auth.mapper.UserMapper;
 import com.clinic.cms.auth.repository.UserRepository;
 import com.clinic.cms.auth.security.JwtService;
+import com.clinic.cms.auth.security.TokenBlacklistService;
 import com.clinic.cms.auth.service.AuthService;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Override
     public LoginResponse login(LoginRequest request) {
@@ -92,8 +94,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void logout(String token) {
-        // Stateless JWT: client simply discards the token.
-        // If using TokenRepository, mark the token as revoked here.
+        long remainingTime = jwtService.getRemainingExpiration(token);
+
+        if (remainingTime > 0) {
+            tokenBlacklistService.blacklist(token, remainingTime);
+        }
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.clinic.cms.appointment.enums.AppointmentStatus;
 import com.clinic.cms.appointment.repository.AppointmentRepository;
 import com.clinic.cms.auth.dto.v1.request.UserCreateRequest;
 import com.clinic.cms.auth.entity.User;
+import com.clinic.cms.auth.security.CurrentUserService;
 import com.clinic.cms.auth.service.UserService;
 import com.clinic.cms.doctor.dto.v1.*;
 import com.clinic.cms.doctor.entity.Doctor;
@@ -40,6 +41,7 @@ public class DoctorServiceImpl implements DoctorService {
     private final PatientMapper patientMapper;
     private final UserService userService;
     private  final PasswordEncoder passwordEncoder;
+    private final CurrentUserService currentUserService;
 
     @Override
     public DoctorResponse createDoctor(
@@ -208,6 +210,9 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     @Transactional(readOnly = true)
     public List<PatientResponse> getDoctorPatients(Long doctorId) {
+
+        checkDoctorAccess(doctorId);
+
         return appointmentRepository.findPatientsByDoctorId(doctorId)
                 .stream()
                 .map(patientMapper::toResponse)
@@ -216,6 +221,7 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     public DoctorStatisticsResponse getDoctorStatistics(Long doctorId) {
+        checkDoctorAccess(doctorId);
         long totalAppointments = appointmentRepository.countByDoctorId(doctorId);
 
         long completedAppointments =
@@ -243,6 +249,25 @@ public class DoctorServiceImpl implements DoctorService {
                 todayAppointments,
                 totalPatients
         );
+    }
+
+    private void checkDoctorAccess(Long doctorId) {
+
+        if (currentUserService.hasRole("SYSTEM_ADMIN")) {
+            return;
+        }
+
+        if (!currentUserService.hasRole("DOCTOR")) {
+            throw new ValidationException("Access denied.");
+        }
+
+        Doctor doctor = repository.findByUserId(currentUserService.getUserId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Doctor profile not found"));
+
+        if (!doctor.getId().equals(doctorId)) {
+            throw new ValidationException("You can access only your own data.");
+        }
     }
 
 }

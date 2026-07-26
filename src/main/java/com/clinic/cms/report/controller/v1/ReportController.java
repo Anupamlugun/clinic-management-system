@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +24,7 @@ public class ReportController {
 
     @Operation(summary = "Get dashboard report")
     @GetMapping("/dashboard")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('VIEW_DASHBOARD')")
     public ResponseEntity<ApiResponse<DashboardResponse>> getDashboard() {
         return ResponseEntity.ok(
                 ApiResponse.success(
@@ -34,48 +36,56 @@ public class ReportController {
 
     @Operation(summary = "Get today's report")
     @GetMapping("/today")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('VIEW_REPORTS')")
     public ResponseEntity<ApiResponse<TodayReportResponse>> getTodayReport() {
         return ResponseEntity.ok(ApiResponse.success("Today's report fetched successfully", reportService.getTodayReport()));
     }
 
     @Operation(summary = "Get revenue report")
     @GetMapping("/revenue")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('VIEW_REVENUE_REPORT')")
     public ResponseEntity<ApiResponse<RevenueReportResponse>> getRevenue() {
         return ResponseEntity.ok(ApiResponse.success("Revenue report fetched successfully", reportService.getRevenue()));
     }
 
     @Operation(summary = "Get monthly revenue report")
     @GetMapping("/revenue/monthly")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('VIEW_REVENUE_REPORT')")
     public ResponseEntity<ApiResponse<List<MonthlyRevenueResponse>>> getMonthlyRevenue() {
         return ResponseEntity.ok(ApiResponse.success("Monthly revenue report fetched successfully", reportService.getMonthlyRevenue()));
     }
 
     @Operation(summary = "Get yearly revenue report")
     @GetMapping("/revenue/yearly")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('VIEW_REVENUE_REPORT')")
     public ResponseEntity<ApiResponse<List<YearlyRevenueResponse>>> getYearlyRevenue() {
         return ResponseEntity.ok(ApiResponse.success("Yearly revenue report fetched successfully", reportService.getYearlyRevenue()));
     }
 
     @Operation(summary = "Get doctor-wise report")
     @GetMapping("/doctor-wise")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('VIEW_DOCTOR_REPORT')")
     public ResponseEntity<ApiResponse<List<DoctorReportResponse>>> getDoctorWiseReport() {
         return ResponseEntity.ok(ApiResponse.success("Doctor-wise report fetched successfully", reportService.getDoctorWiseReport()));
     }
 
     @Operation(summary = "Get patient-wise report")
     @GetMapping("/patient-wise")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('VIEW_PATIENT_REPORT')")
     public ResponseEntity<ApiResponse<List<PatientReportResponse>>> getPatientWiseReport() {
         return ResponseEntity.ok(ApiResponse.success("Patient-wise report fetched successfully", reportService.getPatientWiseReport()));
     }
 
     @Operation(summary = "Get appointment summary")
     @GetMapping("/appointment-summary")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('VIEW_APPOINTMENT_REPORT')")
     public ResponseEntity<ApiResponse<AppointmentSummaryResponse>> getAppointmentSummary() {
         return ResponseEntity.ok(ApiResponse.success("Appointment summary fetched successfully", reportService.getAppointmentSummary()));
     }
 
     @Operation(summary = "Get payment summary")
     @GetMapping("/payment-summary")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('VIEW_PAYMENT_REPORT')")
     public ResponseEntity<ApiResponse<PaymentSummaryResponse>> getPaymentSummary() {
         return ResponseEntity.ok(ApiResponse.success("Payment summary fetched successfully", reportService.getPaymentSummary()));
     }

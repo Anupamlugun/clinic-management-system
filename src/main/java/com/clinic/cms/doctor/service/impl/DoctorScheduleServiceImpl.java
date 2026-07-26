@@ -1,5 +1,6 @@
 package com.clinic.cms.doctor.service.impl;
 
+import com.clinic.cms.auth.security.CurrentUserService;
 import com.clinic.cms.doctor.enums.DoctorStatus;
 import com.clinic.cms.exception.custom.ResourceAlreadyExistsException;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
@@ -17,6 +18,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,6 +29,7 @@ public class DoctorScheduleServiceImpl implements DoctorScheduleService {
     private final DoctorRepository doctorRepository;
     private final DoctorScheduleRepository scheduleRepository;
     private final DoctorScheduleMapper scheduleMapper;
+    private final CurrentUserService currentUserService;
 
     @Override
     public DoctorScheduleResponse createSchedule(
@@ -37,6 +40,13 @@ public class DoctorScheduleServiceImpl implements DoctorScheduleService {
                         new ResourceNotFoundException(
                                 "Doctor not found with id: "
                                         + request.doctorId()));
+
+        if (currentUserService.hasRole("DOCTOR")
+                && !doctor.getUser().getId().equals(currentUserService.getUserId())) {
+
+            throw new AccessDeniedException(
+                    "You cannot create schedules for another doctor.");
+        }
 
         if (!doctor.getActive()) {
             throw new ValidationException("Doctor is inactive");
@@ -67,12 +77,14 @@ public class DoctorScheduleServiceImpl implements DoctorScheduleService {
     public DoctorScheduleResponse getSchedule(
             Long id) {
 
-        return scheduleMapper.toResponse(
-                scheduleRepository.findById(id)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Schedule not found with id: "
-                                                + id)));
+        DoctorSchedule schedule = scheduleRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Schedule not found with id: " + id));
+
+        checkDoctorScheduleAccess(schedule);
+
+        return scheduleMapper.toResponse(schedule);
     }
 
     @Override
@@ -96,6 +108,8 @@ public class DoctorScheduleServiceImpl implements DoctorScheduleService {
                                         "Schedule not found with id: "
                                                 + id));
 
+        checkDoctorScheduleAccess(schedule);
+
         schedule.setDay(request.day());
         schedule.setStartTime(request.startTime());
         schedule.setEndTime(request.endTime());
@@ -114,7 +128,29 @@ public class DoctorScheduleServiceImpl implements DoctorScheduleService {
                                 new ResourceNotFoundException(
                                         "Schedule not found with id: "
                                                 + id));
-
+        checkDoctorScheduleAccess(schedule);
         scheduleRepository.delete(schedule);
+    }
+
+    private void checkDoctorScheduleAccess(DoctorSchedule schedule) {
+
+        if (currentUserService.hasRole("SYSTEM_ADMIN")
+                || currentUserService.hasRole("RECEPTIONIST")) {
+            return;
+        }
+
+        if (currentUserService.hasRole("DOCTOR")) {
+
+            Long currentUserId = currentUserService.getUserId();
+
+            if (!schedule.getDoctor().getUser().getId().equals(currentUserId)) {
+                throw new AccessDeniedException(
+                        "You are not allowed to access this doctor's schedule.");
+            }
+
+            return;
+        }
+
+        throw new AccessDeniedException("Access denied.");
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ public class AppointmentSlotController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get Appointment Slot By Id")
+    @PreAuthorize("hasAuthority('VIEW_APPOINTMENT_SLOT')")
     public ResponseEntity<ApiResponse<AppointmentSlotResponse>>
     get(@PathVariable Long id) {
 
@@ -39,6 +41,7 @@ public class AppointmentSlotController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('VIEW_ALL_APPOINTMENT_SLOTS')")
     @Operation(summary = "Get All Appointment Slots")
     public ResponseEntity<ApiResponse<Page<AppointmentSlotResponse>>>
     getAll(
@@ -57,6 +60,7 @@ public class AppointmentSlotController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('VIEW_ALL_APPOINTMENT_SLOTS')")
     @Operation(summary = "Get Slots By Doctor And Date")
     public ResponseEntity<ApiResponse<Page<AppointmentSlotResponse>>>
     getByDoctorAndDate(
@@ -77,6 +81,7 @@ public class AppointmentSlotController {
     }
 
     @GetMapping("/available")
+    @PreAuthorize("hasAuthority('VIEW_ALL_APPOINTMENT_SLOTS')")
     @Operation(summary = "Get Available Appointment Slots")
     public ResponseEntity<ApiResponse<Page<AppointmentSlotResponse>>> getAvailableSlots(
             @ParameterObject Pageable pageable) {
@@ -88,6 +93,7 @@ public class AppointmentSlotController {
     }
 
     @GetMapping("/booked")
+    @PreAuthorize("hasAuthority('VIEW_ALL_APPOINTMENT_SLOTS')")
     @Operation(summary = "Get Booked Appointment Slots")
     public ResponseEntity<ApiResponse<Page<AppointmentSlotResponse>>> getBookedSlots(
             @ParameterObject Pageable pageable) {
@@ -99,6 +105,12 @@ public class AppointmentSlotController {
     }
 
     @PatchMapping("/{id}/activate")
+    @PreAuthorize("""
+        hasRole('SYSTEM_ADMIN')
+        or
+        (hasRole('RECEPTIONIST')
+        and hasAuthority('ACTIVATE_APPOINTMENT_SLOT'))
+    """)
     @Operation(summary = "Activate Appointment Slot")
     public ResponseEntity<ApiResponse<AppointmentSlotResponse>> activateSlot(
             @PathVariable Long id) {
@@ -110,6 +122,12 @@ public class AppointmentSlotController {
     }
 
     @PatchMapping("/{id}/deactivate")
+    @PreAuthorize("""
+        hasRole('SYSTEM_ADMIN')
+        or
+        (hasRole('RECEPTIONIST')
+        and hasAuthority('DEACTIVATE_APPOINTMENT_SLOT'))
+    """)
     @Operation(summary = "Deactivate Appointment Slot")
     public ResponseEntity<ApiResponse<AppointmentSlotResponse>> deactivateSlot(
             @PathVariable Long id) {

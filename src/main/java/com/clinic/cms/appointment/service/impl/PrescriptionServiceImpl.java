@@ -11,6 +11,7 @@ import com.clinic.cms.appointment.repository.AppointmentRepository;
 import com.clinic.cms.appointment.repository.PrescriptionMedicineRepository;
 import com.clinic.cms.appointment.repository.PrescriptionRepository;
 import com.clinic.cms.appointment.service.PrescriptionService;
+import com.clinic.cms.auth.security.CurrentUserService;
 import com.clinic.cms.doctor.entity.Doctor;
 import com.clinic.cms.doctor.repository.DoctorRepository;
 import com.clinic.cms.exception.custom.ResourceAlreadyExistsException;
@@ -21,6 +22,7 @@ import com.clinic.cms.patient.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     private final PatientRepository patientRepository;
     private final PrescriptionMedicineRepository medicineRepository;
     private final PrescriptionMapper mapper;
+    private final CurrentUserService currentUserService;
 
     @Override
     public PrescriptionResponse createPrescription(
@@ -92,11 +95,13 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     public PrescriptionResponse getPrescription(
             Long id) {
 
-        return mapper.toResponse(
-                repository.findById(id)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Prescription not found")));
+        Prescription prescription = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Prescription not found"));
+
+        validateOwnership(prescription);
+
+        return mapper.toResponse(prescription);
     }
 
     @Override
@@ -115,8 +120,9 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
         Prescription prescription = repository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Prescription not found"));
+                        new ResourceNotFoundException("Prescription not found"));
+
+        validateOwnership(prescription);
 
 
         Appointment appointment = appointmentRepository
@@ -143,8 +149,9 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
         Prescription prescription = repository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Prescription not found"));
+                        new ResourceNotFoundException("Prescription not found"));
+
+        validateOwnership(prescription);
 
         if (medicineRepository.existsByPrescriptionId(id)) {
             throw new ValidationException(
@@ -193,12 +200,13 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     public PrescriptionResponse getPrescriptionByAppointment(
             Long appointmentId) {
 
-        return mapper.toResponse(
-                repository.findByAppointmentId(
-                                appointmentId)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Prescription not found")));
+        Prescription prescription = repository.findByAppointmentId(appointmentId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Prescription not found"));
+
+        validateOwnership(prescription);
+
+        return mapper.toResponse(prescription);
     }
 
     @Override
@@ -209,5 +217,44 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         return repository.findByFollowUpDateIsNotNull(
                         pageable)
                 .map(mapper::toResponse);
+    }
+
+    private void validateOwnership(Prescription prescription) {
+
+        if (currentUserService.hasRole("SYSTEM_ADMIN")) {
+            return;
+        }
+
+        Long currentUserId = currentUserService.getUserId();
+
+        if (currentUserService.hasRole("DOCTOR")) {
+
+            Long doctorUserId = prescription.getDoctor()
+                    .getUser()
+                    .getId();
+
+            if (!doctorUserId.equals(currentUserId)) {
+                throw new AccessDeniedException(
+                        "You can only access your own prescriptions");
+            }
+
+            return;
+        }
+
+        if (currentUserService.hasRole("PATIENT")) {
+
+            Long patientUserId = prescription.getPatient()
+                    .getUser()
+                    .getId();
+
+            if (!patientUserId.equals(currentUserId)) {
+                throw new AccessDeniedException(
+                        "You can only access your own prescriptions");
+            }
+
+            return;
+        }
+
+        throw new AccessDeniedException("Access denied");
     }
 }

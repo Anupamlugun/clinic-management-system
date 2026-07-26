@@ -24,7 +24,8 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
 
-    private final SecurityProperties securityProperties;;
+    private final SecurityProperties securityProperties;
+    private final TokenBlacklistService tokenBlacklistService;
 
     private SecretKey secretKey;
 
@@ -77,6 +78,10 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public boolean isTokenValid(String token) {
+        if (tokenBlacklistService.isBlacklisted(token)) {
+            return false;
+        }
+
         try {
             return !isTokenExpired(token);
         } catch (Exception ex) {
@@ -142,5 +147,13 @@ public class JwtServiceImpl implements JwtService {
         } catch (Exception ex) {
             throw new IllegalArgumentException("Invalid JWT token.");
         }
+    }
+
+    @Override
+    public long getRemainingExpiration(String token) {
+
+        Date expiration = extractExpiration(token);
+
+        return expiration.getTime() - System.currentTimeMillis();
     }
 }

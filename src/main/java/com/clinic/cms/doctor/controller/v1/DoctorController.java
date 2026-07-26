@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -31,6 +32,7 @@ public class DoctorController {
     private final DoctorService doctorService;
 
     @PostMapping
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('CREATE_DOCTOR')")
     @Operation(summary = "Create Doctor")
     public ResponseEntity<ApiResponse<DoctorResponse>> create(
             @Valid @RequestBody DoctorCreateRequest request) {
@@ -42,6 +44,12 @@ public class DoctorController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("""
+    (hasRole('SYSTEM_ADMIN') or
+     hasRole('RECEPTIONIST') or
+     hasRole('DOCTOR'))
+     and hasAuthority('VIEW_DOCTOR')
+    """)
     @Operation(summary = "Get Doctor By Id")
     public ResponseEntity<ApiResponse<DoctorResponse>> get(
             @PathVariable Long id) {
@@ -53,6 +61,11 @@ public class DoctorController {
     }
 
     @GetMapping
+    @PreAuthorize("""
+    (hasRole('SYSTEM_ADMIN') or
+     hasRole('RECEPTIONIST'))
+     and hasAuthority('VIEW_ALL_DOCTORS')
+    """)
     @Operation(summary = "Get All Doctors")
     public ResponseEntity<ApiResponse<Page<DoctorResponse>>> getAll(
             @ParameterObject
@@ -71,6 +84,7 @@ public class DoctorController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('UPDATE_DOCTOR')")
     @Operation(summary = "Update Doctor")
     public ResponseEntity<ApiResponse<DoctorResponse>> update(
             @PathVariable Long id,
@@ -83,6 +97,7 @@ public class DoctorController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('DELETE_DOCTOR')")
     @Operation(summary = "Delete Doctor")
     public ResponseEntity<ApiResponse<Void>> delete(
             @PathVariable Long id) {
@@ -94,6 +109,7 @@ public class DoctorController {
     }
 
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('UPDATE_DOCTOR_STATUS')")
     @Operation(summary = "update doctor status")
     public ResponseEntity<ApiResponse<DoctorResponse>> updateStatus(@PathVariable Long id, DoctorStatusUpdateRequest request) {
 
@@ -102,6 +118,12 @@ public class DoctorController {
     }
 
     @GetMapping("/status")
+    @PreAuthorize("""
+    (hasRole('SYSTEM_ADMIN') or
+     hasRole('RECEPTIONIST') or
+     hasRole('DOCTOR'))
+     and hasAuthority('VIEW_DOCTOR')
+    """)
     @Operation(summary = "Fetch All Doctor Status")
     public ResponseEntity<ApiResponse<List<EnumResponse>>> getDoctorStatus(){
         List<EnumResponse> doctorStatus = Arrays.stream(DoctorStatus.values())
@@ -115,6 +137,11 @@ public class DoctorController {
                 doctorStatus));
     }
     @GetMapping("/top")
+    @PreAuthorize("""
+    (hasRole('SYSTEM_ADMIN') or
+     hasRole('RECEPTIONIST'))
+     and hasAuthority('VIEW_ALL_DOCTORS')
+    """)
     @Operation(summary = "Get Top Doctors")
     public ResponseEntity<ApiResponse<List<DoctorResponse>>> getTopDoctors() {
 
@@ -125,6 +152,11 @@ public class DoctorController {
     }
 
     @GetMapping("/active")
+    @PreAuthorize("""
+    (hasRole('SYSTEM_ADMIN') or
+     hasRole('RECEPTIONIST'))
+     and hasAuthority('VIEW_ALL_DOCTORS')
+    """)
     @Operation(summary = "Get Active Doctors")
     public ResponseEntity<ApiResponse<Page<DoctorResponse>>> getActiveDoctors(
             @ParameterObject
@@ -142,6 +174,10 @@ public class DoctorController {
     }
 
     @GetMapping("/inactive")
+    @PreAuthorize("""
+    hasRole('SYSTEM_ADMIN')
+    and hasAuthority('VIEW_ALL_DOCTORS')
+    """)
     @Operation(summary = "Get Inactive Doctors")
     public ResponseEntity<ApiResponse<Page<DoctorResponse>>> getInactiveDoctors(
             @ParameterObject
@@ -159,6 +195,10 @@ public class DoctorController {
     }
 
     @GetMapping("/{id}/patients")
+    @PreAuthorize("""
+    hasRole('SYSTEM_ADMIN')
+    and hasAuthority('VIEW_PATIENT')
+    """)
     @Operation(summary = "Get Doctor Patients")
     public ResponseEntity<ApiResponse<List<PatientResponse>>> getDoctorPatients(
             @PathVariable Long id) {
@@ -170,6 +210,10 @@ public class DoctorController {
     }
 
     @GetMapping("/{id}/statistics")
+    @PreAuthorize("""
+    hasRole('SYSTEM_ADMIN')
+    and hasAuthority('VIEW_DOCTOR')
+    """)
     @Operation(summary = "Get Doctor Statistics")
     public ResponseEntity<ApiResponse<DoctorStatisticsResponse>> getDoctorStatistics(
             @PathVariable Long id) {
@@ -181,6 +225,7 @@ public class DoctorController {
     }
 
     @PatchMapping("/{id}/activate")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('ACTIVATE_DOCTOR')")
     @Operation(summary = "Activate Doctor")
     public ResponseEntity<ApiResponse<DoctorResponse>> activateDoctor(
             @PathVariable Long id) {
@@ -192,6 +237,7 @@ public class DoctorController {
     }
 
     @PatchMapping("/{id}/deactivate")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('DEACTIVATE_DOCTOR')")
     @Operation(summary = "Deactivate Doctor")
     public ResponseEntity<ApiResponse<DoctorResponse>> deactivateDoctor(
             @PathVariable Long id) {

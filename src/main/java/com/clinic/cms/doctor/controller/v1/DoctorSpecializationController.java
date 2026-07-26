@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -30,6 +31,7 @@ public class DoctorSpecializationController {
     private final DoctorSpecializationService service;
 
     @PostMapping
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('CREATE_DOCTOR_SPECIALIZATION')")
     @Operation(summary = "Create Doctor specializations")
     public ResponseEntity<ApiResponse<DoctorSpecializationResponse>> create(
             @Valid @RequestBody DoctorSpecializationCreateRequest request) {
@@ -44,6 +46,7 @@ public class DoctorSpecializationController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('VIEW_DOCTOR_SPECIALIZATION')")
     @Operation(summary = "Get Doctor specializations By Id")
     public ResponseEntity<ApiResponse<DoctorSpecializationResponse>> get(
             @PathVariable Long id) {
@@ -56,6 +59,7 @@ public class DoctorSpecializationController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('VIEW_ALL_DOCTOR_SPECIALIZATIONS')")
     @Operation(summary="Get All Doctor Specialization")
     public ResponseEntity<ApiResponse<Page<DoctorSpecializationResponse>>> getAll(
             @ParameterObject
@@ -74,6 +78,7 @@ public class DoctorSpecializationController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('UPDATE_DOCTOR_SPECIALIZATION')")
     @Operation(summary="Update Doctor Specialization")
     public ResponseEntity<ApiResponse<DoctorSpecializationResponse>> update(
             @PathVariable Long id,
@@ -87,6 +92,7 @@ public class DoctorSpecializationController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('DELETE_DOCTOR_SPECIALIZATION')")
     @Operation(summary="Delete Doctor Specialization")
     public ResponseEntity<ApiResponse<Void>> delete(
             @PathVariable Long id) {

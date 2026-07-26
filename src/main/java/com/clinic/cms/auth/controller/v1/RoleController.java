@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class RoleController {
     private final RoleService roleService;
 
     @PostMapping
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('CREATE_ROLE')")
     @Operation(summary = "Create role")
     public ResponseEntity<ApiResponse<RoleResponse>> create(
             @Valid @RequestBody RoleCreateRequest request) {
@@ -37,6 +39,7 @@ public class RoleController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('UPDATE_ROLE')")
     @Operation(summary = "Update role")
     public ResponseEntity<ApiResponse<RoleResponse>> update(
             @PathVariable Long id,
@@ -51,6 +54,7 @@ public class RoleController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('VIEW_ROLE')")
     @Operation(summary = "Get role by ID")
     public ResponseEntity<ApiResponse<RoleResponse>> getById(
             @PathVariable Long id) {
@@ -64,6 +68,7 @@ public class RoleController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('VIEW_ALL_ROLES')")
     @Operation(summary = "Get all roles")
     public ResponseEntity<ApiResponse<List<RoleResponse>>> getAll() {
 
@@ -76,6 +81,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('DELETE_ROLE')")
     @Operation(summary = "Delete role")
     public ResponseEntity<ApiResponse<Void>> delete(
             @PathVariable Long id) {
@@ -88,6 +94,7 @@ public class RoleController {
     }
 
     @PostMapping("/{roleId}/permissions")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('ASSIGN_PERMISSION')")
     @Operation(summary = "Assign permissions to role")
     public ResponseEntity<ApiResponse<Void>> assignPermissions(
             @PathVariable Long roleId,
@@ -101,6 +108,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/{roleId}/permissions/{permissionId}")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('ASSIGN_PERMISSION')")
     @Operation(summary = "Remove permission from role")
     public ResponseEntity<ApiResponse<Void>> removePermission(
             @PathVariable Long roleId,

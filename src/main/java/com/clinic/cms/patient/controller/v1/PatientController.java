@@ -20,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -34,6 +35,7 @@ public class PatientController {
     private final PatientService patientService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('SYSTEM_ADMIN','RECEPTIONIST') and hasAuthority('CREATE_PATIENT')")
     @Operation(summary = "Create Patient")
     public ResponseEntity<ApiResponse<PatientResponse>>
     create(
@@ -48,6 +50,7 @@ public class PatientController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('VIEW_PATIENT')")
     @Operation(summary = "Fetch Patient By Id")
     public ResponseEntity<ApiResponse<PatientResponse>>
     get(@PathVariable Long id) {
@@ -59,6 +62,7 @@ public class PatientController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('SYSTEM_ADMIN','RECEPTIONIST') and hasAuthority('VIEW_ALL_PATIENTS')")
     @Operation(summary = "Fetch All Patient")
     public ResponseEntity<ApiResponse<Page<PatientResponse>>>
     getAll(
@@ -78,6 +82,7 @@ public class PatientController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SYSTEM_ADMIN','RECEPTIONIST') and hasAuthority('UPDATE_PATIENT')")
     @Operation(summary = "Update Patient")
     public ResponseEntity<ApiResponse<PatientResponse>>
     update(
@@ -91,6 +96,7 @@ public class PatientController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('DELETE_PATIENT')")
     @Operation(summary = "Delete Patient")
     public ResponseEntity<ApiResponse<Void>>
     delete(@PathVariable Long id) {
@@ -103,6 +109,7 @@ public class PatientController {
     }
 
     @GetMapping("/blood-groups")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Fetch All Blood Groups")
     public ResponseEntity<ApiResponse<List<EnumResponse>>> getBloodGroups() {
 
@@ -118,6 +125,7 @@ public class PatientController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('SYSTEM_ADMIN','RECEPTIONIST') and hasAuthority('VIEW_ALL_PATIENTS')")
     @Operation(summary = "Search Patients")
     public ResponseEntity<ApiResponse<Page<PatientResponse>>> search(
             @RequestParam(required = false) String keyword,
@@ -136,6 +144,7 @@ public class PatientController {
     }
 
     @GetMapping("/{id}/payments")
+    @PreAuthorize("hasAuthority('VIEW_PAYMENT')")
     @Operation(summary = "Fetch Patient Payments")
     public ResponseEntity<ApiResponse<Page<PaymentResponse>>> getPayments(
             @PathVariable Long id,
@@ -154,6 +163,7 @@ public class PatientController {
     }
 
     @GetMapping("/{id}/appointments")
+    @PreAuthorize("hasAuthority('VIEW_APPOINTMENT')")
     @Operation(summary = "Fetch Patient Appointments")
     public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getAppointments(
             @PathVariable Long id,
@@ -172,6 +182,7 @@ public class PatientController {
     }
 
     @PatchMapping("/{id}/activate")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('ACTIVATE_PATIENT')")
     @Operation(summary = "Activate Patient")
     public ResponseEntity<ApiResponse<PatientResponse>> activate(
             @PathVariable Long id) {
@@ -183,6 +194,7 @@ public class PatientController {
     }
 
     @PatchMapping("/{id}/deactivate")
+    @PreAuthorize("hasRole('SYSTEM_ADMIN') and hasAuthority('DEACTIVATE_PATIENT')")
     @Operation(summary = "Deactivate Patient")
     public ResponseEntity<ApiResponse<PatientResponse>> deactivate(
             @PathVariable Long id) {

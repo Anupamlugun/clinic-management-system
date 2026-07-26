@@ -9,11 +9,13 @@ import com.clinic.cms.appointment.mapper.v1.PrescriptionMedicineMapper;
 import com.clinic.cms.appointment.repository.PrescriptionMedicineRepository;
 import com.clinic.cms.appointment.repository.PrescriptionRepository;
 import com.clinic.cms.appointment.service.PrescriptionMedicineService;
+import com.clinic.cms.auth.security.CurrentUserService;
 import com.clinic.cms.exception.custom.ResourceNotFoundException;
 import com.clinic.cms.exception.custom.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ public class PrescriptionMedicineServiceImpl
     private final PrescriptionMedicineRepository repository;
     private final PrescriptionRepository prescriptionRepository;
     private final PrescriptionMedicineMapper mapper;
+    private final CurrentUserService currentUserService;
 
     @Override
     public PrescriptionMedicineResponse createMedicine(
@@ -34,8 +37,9 @@ public class PrescriptionMedicineServiceImpl
         Prescription prescription = prescriptionRepository
                 .findById(request.prescriptionId())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Prescription not found"));
+                        new ResourceNotFoundException("Prescription not found"));
+
+        checkPrescriptionAccess(prescription);
 
         validateDuration(request.durationDays());
 
@@ -53,11 +57,13 @@ public class PrescriptionMedicineServiceImpl
     public PrescriptionMedicineResponse getMedicine(
             Long id) {
 
-        return mapper.toResponse(
-                repository.findById(id)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Medicine not found")));
+        PrescriptionMedicine medicine = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Medicine not found"));
+
+        checkPrescriptionAccess(medicine.getPrescription());
+
+        return mapper.toResponse(medicine);
     }
 
     @Override
@@ -74,11 +80,11 @@ public class PrescriptionMedicineServiceImpl
             Long id,
             PrescriptionMedicineUpdateRequest request) {
 
-        PrescriptionMedicine medicine =
-                repository.findById(id)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Medicine not found"));
+        PrescriptionMedicine medicine = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Medicine not found"));
+
+        checkPrescriptionAccess(medicine.getPrescription());
 
         if (request.durationDays() != null) {
             validateDuration(request.durationDays());
@@ -96,11 +102,11 @@ public class PrescriptionMedicineServiceImpl
     public void deleteMedicine(
             Long id) {
 
-        PrescriptionMedicine medicine =
-                repository.findById(id)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Medicine not found"));
+        PrescriptionMedicine medicine = repository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Medicine not found"));
+
+        checkPrescriptionAccess(medicine.getPrescription());
 
         repository.delete(medicine);
     }
@@ -133,6 +139,33 @@ public class PrescriptionMedicineServiceImpl
         if (durationDays <= 0) {
             throw new ValidationException(
                     "Duration days must be greater than zero");
+        }
+    }
+
+    private void checkPrescriptionAccess(Prescription prescription) {
+
+        // System Admin has unrestricted access
+        if (currentUserService.hasRole("SYSTEM_ADMIN")) {
+            return;
+        }
+
+        // Only doctors should reach here because of @PreAuthorize,
+        // but this is an extra safety check.
+        if (!currentUserService.hasRole("DOCTOR")) {
+            throw new AccessDeniedException("Access denied.");
+        }
+
+        Long loggedInUserId = currentUserService.getUserId();
+
+        Long prescriptionDoctorUserId = prescription
+                .getAppointment()
+                .getDoctor()
+                .getUser()
+                .getId();
+
+        if (!loggedInUserId.equals(prescriptionDoctorUserId)) {
+            throw new AccessDeniedException(
+                    "You are not allowed to access this prescription.");
         }
     }
 }

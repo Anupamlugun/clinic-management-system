@@ -61,4 +61,8 @@ public interface AppointmentRepository
             WHERE a.doctor.id = :doctorId
             """)
     long countDistinctPatientsByDoctorId(Long doctorId);
+
+    boolean existsByDoctorUserIdAndPatientId(
+            Long doctorUserId,
+            Long patientId);
 }

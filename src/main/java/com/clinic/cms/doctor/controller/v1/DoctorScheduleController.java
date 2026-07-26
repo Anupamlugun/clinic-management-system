@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,6 +30,10 @@ public class DoctorScheduleController {
     private final DoctorScheduleService scheduleService;
 
     @PostMapping
+    @PreAuthorize("""
+        hasAuthority('CREATE_DOCTOR_SCHEDULE') &&
+        (hasRole('SYSTEM_ADMIN') || hasRole('RECEPTIONIST'))
+    """)
     @Operation(summary = "Create Doctor Schedule")
     public ResponseEntity<ApiResponse<DoctorScheduleResponse>> create(
             @Valid @RequestBody DoctorScheduleCreateRequest request) {
@@ -40,6 +45,12 @@ public class DoctorScheduleController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("""
+        hasAuthority('VIEW_DOCTOR_SCHEDULE') &&
+        (hasRole('SYSTEM_ADMIN')
+            || hasRole('RECEPTIONIST')
+            || hasRole('DOCTOR'))
+    """)
     @Operation(summary = "Get Doctor Schedule By Id")
     public ResponseEntity<ApiResponse<DoctorScheduleResponse>> get(
             @PathVariable Long id) {
@@ -51,6 +62,11 @@ public class DoctorScheduleController {
     }
 
     @GetMapping
+    @PreAuthorize("""
+        hasAuthority('VIEW_ALL_DOCTOR_SCHEDULES') &&
+        (hasRole('SYSTEM_ADMIN')
+            || hasRole('RECEPTIONIST'))
+    """)
     @Operation(summary = "Get All Doctor Schedules")
     public ResponseEntity<ApiResponse<Page<DoctorScheduleResponse>>> getAll(
             @ParameterObject
@@ -68,6 +84,11 @@ public class DoctorScheduleController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("""
+        hasAuthority('UPDATE_DOCTOR_SCHEDULE') &&
+        (hasRole('SYSTEM_ADMIN')
+            || hasRole('RECEPTIONIST'))
+    """)
     @Operation(summary = "Update Doctor Schedule")
     public ResponseEntity<ApiResponse<DoctorScheduleResponse>> update(
             @PathVariable Long id,
@@ -82,6 +103,10 @@ public class DoctorScheduleController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("""
+        hasAuthority('DELETE_DOCTOR_SCHEDULE') &&
+        hasRole('SYSTEM_ADMIN')
+    """)
     @Operation(summary = "Delete Doctor Schedule")
     public ResponseEntity<ApiResponse<Void>> delete(
             @PathVariable Long id) {

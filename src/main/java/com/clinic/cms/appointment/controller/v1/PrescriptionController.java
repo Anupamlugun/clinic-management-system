@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,6 +30,10 @@ public class PrescriptionController {
     private final PrescriptionService prescriptionService;
 
     @PostMapping
+    @PreAuthorize("""
+        (hasRole('SYSTEM_ADMIN') or hasRole('DOCTOR'))
+        and hasAuthority('CREATE_PRESCRIPTION')
+        """)
     @Operation(summary = "Create Prescription")
     public ResponseEntity<ApiResponse<PrescriptionResponse>> create(
             @Valid
@@ -42,6 +47,7 @@ public class PrescriptionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('VIEW_PRESCRIPTION')")
     @Operation(summary = "Get Prescription By Id")
     public ResponseEntity<ApiResponse<PrescriptionResponse>> get(
             @PathVariable Long id) {
@@ -53,6 +59,7 @@ public class PrescriptionController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('VIEW_ALL_PRESCRIPTIONS')")
     @Operation(summary = "Get All Prescriptions")
     public ResponseEntity<ApiResponse<Page<PrescriptionResponse>>> getAll(
             @ParameterObject
@@ -70,6 +77,10 @@ public class PrescriptionController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("""
+        (hasRole('SYSTEM_ADMIN') or hasRole('DOCTOR'))
+        and hasAuthority('UPDATE_PRESCRIPTION')
+        """)
     @Operation(summary = "Update Prescription")
     public ResponseEntity<ApiResponse<PrescriptionResponse>> update(
             @PathVariable Long id,
@@ -84,6 +95,10 @@ public class PrescriptionController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("""
+        hasRole('SYSTEM_ADMIN')
+        and hasAuthority('DELETE_PRESCRIPTION')
+        """)
     @Operation(summary = "Delete Prescription")
     public ResponseEntity<ApiResponse<Void>> delete(
             @PathVariable Long id) {
@@ -96,6 +111,7 @@ public class PrescriptionController {
     }
 
     @GetMapping("/by-patient/{patientId}")
+    @PreAuthorize("hasAuthority('VIEW_PRESCRIPTION')")
     @Operation(summary = "Get Prescriptions By Patient")
     public ResponseEntity<ApiResponse<Page<PrescriptionResponse>>> getByPatient(
             @PathVariable Long patientId,
@@ -110,6 +126,7 @@ public class PrescriptionController {
     }
 
     @GetMapping("/by-doctor/{doctorId}")
+    @PreAuthorize("hasAuthority('VIEW_PRESCRIPTION')")
     @Operation(summary = "Get Prescriptions By Doctor")
     public ResponseEntity<ApiResponse<Page<PrescriptionResponse>>> getByDoctor(
             @PathVariable Long doctorId,
@@ -124,6 +141,7 @@ public class PrescriptionController {
     }
 
     @GetMapping("/by-appointment/{appointmentId}")
+    @PreAuthorize("hasAuthority('VIEW_PRESCRIPTION')")
     @Operation(summary = "Get Prescription By Appointment")
     public ResponseEntity<ApiResponse<PrescriptionResponse>> getByAppointment(
             @PathVariable Long appointmentId) {
@@ -135,6 +153,7 @@ public class PrescriptionController {
     }
 
     @GetMapping("/follow-up")
+    @PreAuthorize("hasAuthority('VIEW_PRESCRIPTION')")
     @Operation(summary = "Get Prescriptions With Follow-up")
     public ResponseEntity<ApiResponse<Page<PrescriptionResponse>>> getFollowUps(
             @ParameterObject

@@ -3,6 +3,7 @@ package com.clinic.cms.billing.service.impl;
 import com.clinic.cms.appointment.entity.Appointment;
 import com.clinic.cms.appointment.enums.AppointmentStatus;
 import com.clinic.cms.appointment.repository.AppointmentRepository;
+import com.clinic.cms.auth.security.CurrentUserService;
 import com.clinic.cms.billing.dto.v1.PaymentResponse;
 import com.clinic.cms.billing.dto.v1.PaymentUpdateRequest;
 import com.clinic.cms.billing.entity.Payment;
@@ -36,6 +37,7 @@ public class PaymentServiceImpl
     private final PaymentMapper paymentMapper;
     private final BillingProperties billingProperties;
     private final PaymentWorkflowRules paymentWorkflowRules;
+    private final CurrentUserService currentUserService;
 
     @Override
     public Payment createPayment(Long appointmentId) {
@@ -66,6 +68,8 @@ public class PaymentServiceImpl
                                 new ResourceNotFoundException(
                                         "Payment not found"));
 
+        checkPaymentAccess(payment);
+
         return paymentMapper.toResponse(payment);
     }
 
@@ -89,6 +93,8 @@ public class PaymentServiceImpl
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
                                         "Payment not found"));
+
+        checkPaymentAccess(payment);
         AppointmentStatus appointmentStatus =
                 payment.getAppointment().getStatus();
 
@@ -153,6 +159,8 @@ public class PaymentServiceImpl
                         new ResourceNotFoundException(
                                 "Payment not found"));
 
+        checkPaymentAccess(payment);
+
         return paymentMapper.toResponse(payment);
     }
 
@@ -175,5 +183,47 @@ public class PaymentServiceImpl
         return paymentRepository
                 .findAllByOrderByCreatedAtDesc(pageable)
                 .map(paymentMapper::toResponse);
+    }
+
+    private void checkPaymentAccess(Payment payment) {
+
+        if (currentUserService.hasRole("SYSTEM_ADMIN")
+                || currentUserService.hasRole("RECEPTIONIST")) {
+            return;
+        }
+
+        Long currentUserId = currentUserService.getUserId();
+
+        if (currentUserService.hasRole("DOCTOR")) {
+
+            Long doctorUserId = payment.getAppointment()
+                    .getDoctor()
+                    .getUser()
+                    .getId();
+
+            if (!doctorUserId.equals(currentUserId)) {
+                throw new ValidationException(
+                        "You are not authorized to access this payment.");
+            }
+
+            return;
+        }
+
+        if (currentUserService.hasRole("PATIENT")) {
+
+            Long patientUserId = payment.getAppointment()
+                    .getPatient()
+                    .getUser()
+                    .getId();
+
+            if (!patientUserId.equals(currentUserId)) {
+                throw new ValidationException(
+                        "You are not authorized to access this payment.");
+            }
+
+            return;
+        }
+
+        throw new ValidationException("Access denied.");
     }
 }

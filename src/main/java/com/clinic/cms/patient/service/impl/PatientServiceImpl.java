@@ -4,6 +4,7 @@ import com.clinic.cms.appointment.dto.v1.AppointmentResponse;
 import com.clinic.cms.appointment.mapper.v1.AppointmentMapper;
 import com.clinic.cms.appointment.repository.AppointmentRepository;
 import com.clinic.cms.auth.entity.User;
+import com.clinic.cms.auth.security.CurrentUserService;
 import com.clinic.cms.auth.service.UserService;
 import com.clinic.cms.billing.dto.v1.PaymentResponse;
 import com.clinic.cms.billing.mapper.v1.PaymentMapper;
@@ -39,6 +40,7 @@ public class PatientServiceImpl implements PatientService {
     private final AppointmentMapper appointmentMapper;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
+    private final CurrentUserService currentUserService;
 
     @Override
     public PatientResponse createPatient(
@@ -69,10 +71,7 @@ public class PatientServiceImpl implements PatientService {
     @Transactional(readOnly = true)
     public PatientResponse getPatient(Long id) {
 
-        Patient patient = repository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Patient not found"));
+        Patient patient = getPatientWithAccess(id);
 
         return mapper.toResponse(patient);
     }
@@ -175,7 +174,7 @@ public class PatientServiceImpl implements PatientService {
             Long patientId,
             Pageable pageable) {
 
-        getPatient(patientId);
+        getPatientWithAccess(patientId);
 
         return paymentRepository
                 .findByAppointmentPatientId(patientId, pageable)
@@ -188,10 +187,41 @@ public class PatientServiceImpl implements PatientService {
             Long patientId,
             Pageable pageable) {
 
-        getPatient(patientId);
+        getPatientWithAccess(patientId);
 
         return appointmentRepository
                 .findByPatientId(patientId, pageable)
                 .map(appointmentMapper::toResponse);
+    }
+
+    private Patient getPatientWithAccess(Long patientId) {
+
+        Patient patient = repository.findById(patientId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Patient not found"));
+
+        // Admin and Receptionist can access every patient
+        if (currentUserService.hasRole("SYSTEM_ADMIN")
+                || currentUserService.hasRole("RECEPTIONIST")) {
+            return patient;
+        }
+
+        // Patient can access only their own record
+        if (currentUserService.hasRole("PATIENT")
+                && patient.getUser() != null
+                && patient.getUser().getId().equals(currentUserService.getUserId())) {
+            return patient;
+        }
+
+        // Doctor can access only patients having appointments with them
+        if (currentUserService.hasRole("DOCTOR")
+                && appointmentRepository.existsByDoctorUserIdAndPatientId(
+                currentUserService.getUserId(),
+                patientId)) {
+            return patient;
+        }
+
+        throw new org.springframework.security.access.AccessDeniedException(
+                "You are not authorized to access this patient.");
     }
 }

@@ -38,16 +38,12 @@ public class AuthController {
         );
     }
 
-    @Operation(
-            summary = "Refresh Token",
-            description = "Generate new access and refresh tokens using a valid refresh token."
-    )
+    @Operation(summary = "Refresh access token")
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(
-            @Parameter(description = "Bearer Refresh Token", required = true)
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
 
-        String refreshToken = authorizationHeader.replace("Bearer ", "");
+        String refreshToken = authorizationHeader.substring(7);
 
         return ResponseEntity.ok(
                 ApiResponse.success(
@@ -61,13 +57,11 @@ public class AuthController {
             summary = "Logout",
             description = "Logout the currently authenticated user."
     )
-    @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
-            @Parameter(description = "Bearer Access Token", required = true)
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
 
-        String token = authorizationHeader.replace("Bearer ", "");
+        String token = authorizationHeader.substring(7);
 
         authService.logout(token);
 
